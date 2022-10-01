@@ -54,6 +54,19 @@ static int fmn_hw_mgr_configure_kv(struct fmn_hw_mgr *mgr,const char *k,int kc,c
   INTPARAM("fullscreen",video_params.fullscreen,0,1)
   INTPARAM("width",video_params.winw,1,4096)
   INTPARAM("height",video_params.winh,1,4096)
+  INTPARAM("tilesize",tilesize,1,32)
+  
+  if ((kc==5)&&!memcmp(k,"fbfmt",5)) {
+    #define _(tag) else if ((vc==sizeof(#tag)-1)&&!memcmp(v,#tag,vc)) mgr->video_params.fbfmt=FMN_IMAGE_FMT_##tag;
+    if (0) ;
+    FMN_FOR_EACH_IMAGE_FMT
+    else {
+      fprintf(stderr,"%s:%d: Unknown framebuffer format '%.*s'\n",refname,lineno,vc,v);
+      return -2;
+    }
+    #undef _
+    return 0;
+  }
   
   #undef STRPARAM
   #undef INTPARAM
@@ -206,9 +219,10 @@ static int fmn_hw_mgr_init_video_name(const char *name,int namec,void *userdata)
 static int fmn_hw_mgr_init_video(struct fmn_hw_mgr *mgr) {
   int err;
   
-  const int tilesize=8;//TODO where does this come from?
-  mgr->video_params.fbw=FMN_COLC*tilesize;
-  mgr->video_params.fbh=FMN_ROWC*tilesize;
+  if (!mgr->tilesize) mgr->tilesize=8;
+  if (!mgr->video_params.fbfmt) mgr->video_params.fbfmt=FMN_IMAGE_FMT_RGBA;
+  mgr->video_params.fbw=FMN_COLC*mgr->tilesize;
+  mgr->video_params.fbh=FMN_ROWC*mgr->tilesize;
   mgr->video_params.title="Full Moon";
   mgr->video_params.iconrgba=0;//TODO app icon
   mgr->video_params.iconw=0;

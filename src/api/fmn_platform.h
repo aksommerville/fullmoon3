@@ -38,6 +38,8 @@ uint8_t fmn_platform_update();
 /* Video.
  *****************************************************************/
  
+uint8_t fmn_platform_video_get_format();
+ 
 /* You should begin/end once per loop(), and all rendering calls must be between them.
  */
 struct fmn_image *fmn_platform_video_begin();

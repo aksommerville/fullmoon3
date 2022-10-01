@@ -56,6 +56,7 @@ struct fmn_hw_video_glx {
   
   GLuint fbtexid;
   struct fmn_image *fb;
+  uint8_t *fbscratch; // for fb formats we need to convert before upload
   int dstdirty;
   int dstx,dsty,dstw,dsth;
 };

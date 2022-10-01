@@ -6,6 +6,7 @@
 #include "opt/hw/fmn_hw.h"
 #include "opt/time/fmn_time.h"
 #include "opt/inmgr/fmn_inmgr.h"
+#include "game/image/fmn_image.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

@@ -28,6 +28,11 @@ uint8_t fmn_platform_update() {
  * Platform and driver APIs are uncoincidentally similar.
  */
  
+uint8_t fmn_platform_video_get_format() {
+  if (!fmn_genioc.video) return 0;
+  return fmn_genioc.video->fbfmt;
+}
+ 
 struct fmn_image *fmn_platform_video_begin() {
   if (!fmn_genioc.video_begin) return 0;
   return fmn_genioc.video_begin(fmn_genioc.video);

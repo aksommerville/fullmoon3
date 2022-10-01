@@ -3,6 +3,7 @@
 
 #include "fmn_hw.h"
 #include "api/fmn_common.h"
+#include "game/image/fmn_image.h"
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@ struct fmn_hw_mgr {
   char *audio_names;
   char *input_names;
   char *synth_names;
+  int tilesize;
 
   struct fmn_hw_video *video;
   struct fmn_hw_audio *audio;

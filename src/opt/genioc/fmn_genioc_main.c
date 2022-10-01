@@ -71,6 +71,8 @@ static void fmn_genioc_print_usage() {
     "  --fullscreen=0|1    Start with fullscreen video.\n"
     "  --width=INT         Window width.\n"
     "  --height=INT        Window height.\n"
+    "  --tilesize=INT      Tile size: 5 8 16 32\n"
+    "  --fbfmt=FORMAT      Framebuffer format (see below)\n"
     "\n"
   );
   
@@ -86,6 +88,12 @@ static void fmn_genioc_print_usage() {
   fprintf(stderr,"Synth drivers:\n"); LIST_DRIVERS(synth)
   fprintf(stderr,"Input drivers:\n"); LIST_DRIVERS(input)
   #undef LIST_DRIVERS
+  
+  fprintf(stderr,"Framebuffer formats:\n");
+  #define _(tag) if (FMN_IMAGE_FMT_##tag!=FMN_IMAGE_FMT_ENCODED) fprintf(stderr,"  %s\n",#tag);
+  FMN_FOR_EACH_IMAGE_FMT
+  #undef _
+  fprintf(stderr,"\n");
 }
 
 /* Configuration.

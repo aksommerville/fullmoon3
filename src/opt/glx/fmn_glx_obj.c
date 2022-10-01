@@ -5,6 +5,7 @@
  
 static void _glx_del(struct fmn_hw_video *video) {
   fmn_image_del(VIDEO->fb);
+  if (VIDEO->fbscratch) free(VIDEO->fbscratch);
   if (VIDEO->fbtexid) {
     glDeleteTextures(1,&VIDEO->fbtexid);
   }
@@ -251,7 +252,9 @@ static int _glx_init(struct fmn_hw_video *video,const struct fmn_hw_video_params
   XFreeCursor(VIDEO->dpy,cursor);
   XFreePixmap(VIDEO->dpy,pixmap);
   
-  if (!(VIDEO->fb=fmn_image_new_alloc(FMN_IMAGE_FMT_RGBA,video->fbw,video->fbh))) return -1;
+  video->fbfmt=FMN_IMAGE_FMT_RGBA;
+  if (params) video->fbfmt=params->fbfmt;
+  if (!(VIDEO->fb=fmn_image_new_alloc(video->fbfmt,video->fbw,video->fbh))) return -1;
   glGenTextures(1,&VIDEO->fbtexid);
   if (!VIDEO->fbtexid) {
     glGenTextures(1,&VIDEO->fbtexid);
@@ -298,6 +301,31 @@ static void _glx_suppress_screensaver(struct fmn_hw_video *video) {
   VIDEO->screensaver_suppressed=1;
 }
 
+/* Allocate (fbscratch) if needed, and convert (fb) into it.
+ * Both (fbscratch) and (fb->v) are presumed contiguous.
+ */
+ 
+static int fmn_glx_fbcvt_y8_y2(struct fmn_hw_video *video) {
+  if (!VIDEO->fbscratch) {
+    if (!(VIDEO->fbscratch=malloc(VIDEO->fb->w*VIDEO->fb->h))) return -1;
+  }
+  uint8_t *dstp=VIDEO->fbscratch;
+  const uint8_t *srcp=VIDEO->fb->v;
+  uint8_t srcshift=6;
+  int i=VIDEO->fb->w*VIDEO->fb->h;
+  for (;i-->0;dstp++) {
+    switch (((*srcp)>>srcshift)&3) {
+      case 0: *dstp=0x00; break;
+      case 1: *dstp=0x55; break;
+      case 2: *dstp=0xaa; break;
+      case 3: *dstp=0xff; break;
+    }
+    if (srcshift) srcshift-=2;
+    else { srcshift=6; srcp++; }
+  }
+  return 0;
+}
+
 /* Swap buffers.
  */
  
@@ -329,6 +357,10 @@ static void _glx_end(struct fmn_hw_video *video,struct fmn_image *fb) {
   switch (fb->fmt) {
     case FMN_IMAGE_FMT_RGBA: glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,fb->w,fb->h,0,GL_RGBA,GL_UNSIGNED_BYTE,fb->v); break;
     case FMN_IMAGE_FMT_Y8: glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,fb->w,fb->h,0,GL_LUMINANCE,GL_UNSIGNED_BYTE,fb->v); break;
+    case FMN_IMAGE_FMT_Y2: {
+        if (fmn_glx_fbcvt_y8_y2(video)<0) return;
+        glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,fb->w,fb->h,0,GL_LUMINANCE,GL_UNSIGNED_BYTE,VIDEO->fbscratch);
+      } break;
     default: return;
   }
   

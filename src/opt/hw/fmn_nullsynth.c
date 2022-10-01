@@ -79,7 +79,6 @@ static void _nullsynth_release_all(struct fmn_hw_synth *synth) {
 const struct fmn_hw_synth_type fmn_hw_synth_type_nullsynth={
   .name="nullsynth",
   .desc="Dummy synthesizer that only produces silence.",
-  .by_request_only=1,
   .objlen=sizeof(struct fmn_hw_synth_nullsynth),
   .del=_nullsynth_del,
   .init=_nullsynth_init,

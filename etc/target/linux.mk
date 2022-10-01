@@ -32,4 +32,6 @@ linux_EXE:=$(linux_OUTDIR)/fullmoon
 all:$(linux_EXE)
 $(linux_EXE):$(linux_OFILES);$(PRECMD) $(linux_LD) -o$@ $^ $(linux_LDPOST)
 
-linux-run:$(linux_EXE);$(linux_EXE) --synth=nullsynth
+# We do support a color framebuffer of course, and it's the default.
+# But during development, I am only making the 8x8 y2 graphics in the first pass.
+linux-run:$(linux_EXE);$(linux_EXE) --fbfmt=Y2 --tilesize=8

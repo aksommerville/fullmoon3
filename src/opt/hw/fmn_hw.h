@@ -90,6 +90,7 @@ struct fmn_hw_video_params {
   const void *iconrgba;
   int iconw,iconh;
   int fbw,fbh;
+  int fbfmt;
 // Volatile current state:
   int fullscreen;
   int winw,winh;
@@ -98,7 +99,7 @@ struct fmn_hw_video_params {
 struct fmn_hw_video {
   const struct fmn_hw_video_type *type;
   const struct fmn_hw_delegate *delegate;
-  int fbw,fbh;
+  int fbw,fbh,fbfmt;
   int winw,winh;
   int fullscreen;
 };

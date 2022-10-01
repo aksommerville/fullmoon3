@@ -1,5 +1,7 @@
 #include "fmn_image.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <endian.h>
 
 /* Lifecycle.
  */
@@ -60,6 +62,22 @@ int16_t fmn_image_minimum_stride(uint8_t fmt,int16_t w,int16_t h) {
     case FMN_IMAGE_FMT_RGBA: return w*4;
     case FMN_IMAGE_FMT_Y8: return w;
     case FMN_IMAGE_FMT_Y2: return (w+3)>>2;
+  }
+  return 0;
+}
+
+/* Pixel format.
+ */
+ 
+uint32_t fmn_pixel_from_rgba(uint8_t fmt,uint8_t r,uint8_t g,uint8_t b,uint8_t a) {
+  switch (fmt) {
+    #if BYTE_ORDER==BIG_ENDIAN
+      case FMN_IMAGE_FMT_RGBA: return (r<<24)|(g<<16)|(b<<8)|a;
+    #else
+      case FMN_IMAGE_FMT_RGBA: return r|(g<<8)|(b<<16)|(a<<24);
+    #endif
+    case FMN_IMAGE_FMT_Y8: return (r+g+b)/3;
+    case FMN_IMAGE_FMT_Y2: if (!a) return 2; r=(r+g+b)/3; r>>=6; if (r==2) return 1; return r;
   }
   return 0;
 }
