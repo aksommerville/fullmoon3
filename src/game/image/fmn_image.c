@@ -1,7 +1,14 @@
 #include "fmn_image.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <endian.h>
+
+#if FMN_USE_tiny
+  #define BIG_ENDIAN 4321
+  #define LITTLE_ENDIAN 1234
+  #define BYTE_ORDER LITTLE_ENDIAN
+#else
+  #include <endian.h>
+#endif
 
 /* Lifecycle.
  */

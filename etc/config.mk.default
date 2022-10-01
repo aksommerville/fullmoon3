@@ -3,6 +3,12 @@
 # These will be ignored by git.
 
 # FMN_TARGETS names files under etc/target/ to build for.
-FMN_TARGETS:=linux
+FMN_TARGETS:=linux tiny
+
+# https://arduino.cc
+tiny_ARDUINO_HOME:=/home/andy/.arduino15
+tiny_ARDUINO_IDE_HOME:=/home/andy/pkg/arduino-1.8.19
+tiny_GCC_VERSION:=7-2017q4
+tiny_PORT:=ttyACM0
 
 run:linux-run
