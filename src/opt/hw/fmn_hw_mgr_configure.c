@@ -47,7 +47,6 @@ static int fmn_hw_mgr_configure_kv(struct fmn_hw_mgr *mgr,const char *k,int kc,c
   STRPARAM("video",video_names)
   STRPARAM("audio",audio_names)
   STRPARAM("input",input_names)
-  STRPARAM("render",render_names)
   STRPARAM("synth",synth_names)
   INTPARAM("audio-rate",audio_params.rate,200,200000)
   INTPARAM("audio-chanc",audio_params.chanc,1,2)
@@ -186,7 +185,7 @@ int fmn_hw_mgr_configure_text(struct fmn_hw_mgr *mgr,const char *src,int srcc,co
   return 0;
 }
 
-/* Initialize video and render.
+/* Initialize video.
  */
  
 static int fmn_hw_mgr_init_video_type(struct fmn_hw_mgr *mgr,const struct fmn_hw_video_type *type) {
@@ -204,34 +203,19 @@ static int fmn_hw_mgr_init_video_name(const char *name,int namec,void *userdata)
   return fmn_hw_mgr_init_video_type(mgr,type);
 }
  
-static int fmn_hw_mgr_init_render_type(struct fmn_hw_mgr *mgr,const struct fmn_hw_render_type *type) {
-  if (!(mgr->render=fmn_hw_render_new(type,&mgr->delegate,&mgr->render_params))) return 0;
-  return 1;
-}
-
-static int fmn_hw_mgr_init_render_name(const char *name,int namec,void *userdata) {
-  struct fmn_hw_mgr *mgr=userdata;
-  const struct fmn_hw_render_type *type=fmn_hw_render_type_by_name(name,namec);
-  if (!type) {
-    fprintf(stderr,"Renderer '%.*s' not found.\n",namec,name);
-    return 0;
-  }
-  return fmn_hw_mgr_init_render_type(mgr,type);
-}
- 
 static int fmn_hw_mgr_init_video(struct fmn_hw_mgr *mgr) {
   int err;
   
-  if (mgr->render_params.tilesize<1) mgr->render_params.tilesize=8;
-  mgr->render_params.fbw=FMN_COLC*mgr->render_params.tilesize;
-  mgr->render_params.fbh=FMN_ROWC*mgr->render_params.tilesize;
+  const int tilesize=8;//TODO where does this come from?
+  mgr->video_params.fbw=FMN_COLC*tilesize;
+  mgr->video_params.fbh=FMN_ROWC*tilesize;
   mgr->video_params.title="Full Moon";
   mgr->video_params.iconrgba=0;//TODO app icon
   mgr->video_params.iconw=0;
   mgr->video_params.iconh=0;
   if ((mgr->video_params.winw<1)||(mgr->video_params.winh<1)) {
-    mgr->video_params.winw=mgr->render_params.fbw;
-    mgr->video_params.winh=mgr->render_params.fbh;
+    mgr->video_params.winw=mgr->video_params.fbw;
+    mgr->video_params.winh=mgr->video_params.fbh;
     const int max=1000;
     int scalex=max/mgr->video_params.winw;
     int scaley=max/mgr->video_params.winh;
@@ -253,28 +237,17 @@ static int fmn_hw_mgr_init_video(struct fmn_hw_mgr *mgr) {
       if (mgr->video) break;
     }
   }
+  
   if (!mgr->video) {
     fprintf(stderr,"Failed to initialize any video driver.\n");
     return -2;
   }
-  fprintf(stderr,"Using video driver '%s', size=%d,%d\n",mgr->video->type->name,mgr->video->winw,mgr->video->winh);
-  
-  if (mgr->render_names) {
-    if ((err=fmn_for_each_comma_string(mgr->render_names,-1,fmn_hw_mgr_init_render_name,mgr))<0) return err;
-  } else {
-    int i=0;
-    const struct fmn_hw_render_type *type;
-    for (;type=fmn_hw_render_type_by_index(i);i++) {
-      if (type->by_request_only) continue;
-      if ((err=fmn_hw_mgr_init_render_type(mgr,type))<0) return err;
-      if (mgr->render) break;
-    }
-  }
-  if (!mgr->render) {
-    fprintf(stderr,"Failed to initialize any renderer.\n");
-    return -2;
-  }
-  fprintf(stderr,"Using renderer '%s'\n",mgr->render->type->name);
+  fprintf(stderr,
+    "Using video driver '%s', window=%d,%d, framebuffer=%d,%d\n",
+    mgr->video->type->name,
+    mgr->video->winw,mgr->video->winh,
+    mgr->video->fbw,mgr->video->fbh
+  );
   
   return 0;
 }

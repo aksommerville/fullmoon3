@@ -55,6 +55,9 @@ struct fmn_hw_video_glx {
   int focus;
   
   GLuint fbtexid;
+  struct fmn_image *fb;
+  int dstdirty;
+  int dstx,dsty,dstw,dsth;
 };
 
 #define VIDEO ((struct fmn_hw_video_glx*)video)

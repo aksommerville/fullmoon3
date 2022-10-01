@@ -4,6 +4,7 @@
  */
  
 static void _glx_del(struct fmn_hw_video *video) {
+  fmn_image_del(VIDEO->fb);
   if (VIDEO->fbtexid) {
     glDeleteTextures(1,&VIDEO->fbtexid);
   }
@@ -197,6 +198,12 @@ static int _glx_init(struct fmn_hw_video *video,const struct fmn_hw_video_params
   if (params) {
     video->winw=params->winw;
     video->winh=params->winh;
+    video->fbw=params->fbw;
+    video->fbh=params->fbh;
+  }
+  if ((video->fbw<1)||(video->fbh<1)) {
+    video->fbw=160;
+    video->fbh=90;
   }
   if ((video->winw<1)||(video->winh<1)) {
     int monw,monh;
@@ -244,6 +251,19 @@ static int _glx_init(struct fmn_hw_video *video,const struct fmn_hw_video_params
   XFreeCursor(VIDEO->dpy,cursor);
   XFreePixmap(VIDEO->dpy,pixmap);
   
+  if (!(VIDEO->fb=fmn_image_new_alloc(FMN_IMAGE_FMT_RGBA,video->fbw,video->fbh))) return -1;
+  glGenTextures(1,&VIDEO->fbtexid);
+  if (!VIDEO->fbtexid) {
+    glGenTextures(1,&VIDEO->fbtexid);
+    if (!VIDEO->fbtexid) return -1;
+  }
+  glBindTexture(GL_TEXTURE_2D,VIDEO->fbtexid);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+  VIDEO->dstdirty=1;
+  
   return 0;
 }
 
@@ -278,48 +298,56 @@ static void _glx_suppress_screensaver(struct fmn_hw_video *video) {
   VIDEO->screensaver_suppressed=1;
 }
 
-/* Require a texture for the framebuffer, and upload the pixels.
- */
- 
-static int fmn_glx_update_fbtex(struct fmn_hw_video *video,struct fmn_image *fb) {
-  if (VIDEO->fbtexid) {
-    glBindTexture(GL_TEXTURE_2D,VIDEO->fbtexid);
-  } else {
-    glGenTextures(1,&VIDEO->fbtexid);
-    if (!VIDEO->fbtexid) glGenTextures(1,&VIDEO->fbtexid);
-    if (!VIDEO->fbtexid) return -1;
-    glBindTexture(GL_TEXTURE_2D,VIDEO->fbtexid);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);//TODO configurable?
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-  }
-  switch (fb->fmt) {
-    case FMN_IMAGE_FMT_RGBA: glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,fb->w,fb->h,0,GL_RGBA,GL_UNSIGNED_BYTE,fb->v); break;
-    case FMN_IMAGE_FMT_Y8: glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,fb->w,fb->h,0,GL_LUMINANCE,GL_UNSIGNED_BYTE,fb->v); break;
-    default: return -1;
-  }
-  return 0;
-}
-
 /* Swap buffers.
  */
  
-static void _glx_swap(struct fmn_hw_video *video,struct fmn_image *fb) {
-  if (fb) {
-    if (fmn_glx_update_fbtex(video,fb)<0) return;
-    glViewport(0,0,video->winw,video->winh);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glEnable(GL_TEXTURE_2D);
-    GLfloat l=-1.0f,t=1.0f,r=1.0f,b=-1.0f;//TODO
-    glBegin(GL_TRIANGLE_STRIP);
-      glTexCoord2i(0,0); glVertex2f(l,t);
-      glTexCoord2i(0,1); glVertex2f(l,b);
-      glTexCoord2i(1,0); glVertex2f(r,t);
-      glTexCoord2i(1,1); glVertex2f(r,b);
-    glEnd();
+static struct fmn_image *_glx_begin(struct fmn_hw_video *video) {
+  return VIDEO->fb;
+}
+
+static void _glx_end(struct fmn_hw_video *video,struct fmn_image *fb) {
+  if (fb!=VIDEO->fb) return;
+  
+  if (VIDEO->dstdirty) {
+    VIDEO->dstdirty=0;
+    const int fudgepx=10; // If it ends up this close to the window, fill it and allow distortion.
+    int wforh=(video->winh*video->fbw)/video->fbh;
+    if (wforh<=video->winw) {
+      VIDEO->dstw=wforh;
+      VIDEO->dsth=video->winh;
+      if (VIDEO->dstw>=video->winw-fudgepx) VIDEO->dstw=video->winw;
+    } else {
+      VIDEO->dstw=video->winw;
+      VIDEO->dsth=(video->winw*video->fbh)/video->fbw;
+      if (VIDEO->dsth>=video->winh-fudgepx) VIDEO->dsth=video->winh;
+    }
+    VIDEO->dstx=(video->winw>>1)-(VIDEO->dstw>>1);
+    VIDEO->dsty=(video->winh>>1)-(VIDEO->dsth>>1);
   }
+  
+  glBindTexture(GL_TEXTURE_2D,VIDEO->fbtexid);
+  switch (fb->fmt) {
+    case FMN_IMAGE_FMT_RGBA: glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,fb->w,fb->h,0,GL_RGBA,GL_UNSIGNED_BYTE,fb->v); break;
+    case FMN_IMAGE_FMT_Y8: glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,fb->w,fb->h,0,GL_LUMINANCE,GL_UNSIGNED_BYTE,fb->v); break;
+    default: return;
+  }
+  
+  if ((VIDEO->dstw<video->winw)||(VIDEO->dsth<video->winh)) {
+    glViewport(0,0,video->winw,video->winh);
+    glClearColor(0.0f,0.0f,0.0f,1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+  }
+  glViewport(VIDEO->dstx,VIDEO->dsty,VIDEO->dstw,VIDEO->dsth);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glEnable(GL_TEXTURE_2D);
+  glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2i(0,0); glVertex2i(-1, 1);
+    glTexCoord2i(0,1); glVertex2i(-1,-1);
+    glTexCoord2i(1,0); glVertex2i( 1, 1);
+    glTexCoord2i(1,1); glVertex2i( 1,-1);
+  glEnd();
+
   glXSwapBuffers(VIDEO->dpy,VIDEO->win);
   VIDEO->screensaver_suppressed=0;
 }
@@ -331,10 +359,12 @@ const struct fmn_hw_video_type fmn_hw_video_type_glx={
   .name="glx",
   .desc="X11 with OpenGL, for Linux.",
   .objlen=sizeof(struct fmn_hw_video_glx),
+  .provides_system_keyboard=1,
   .del=_glx_del,
   .init=_glx_init,
   .update=fmn_glx_update,
-  .swap=_glx_swap,
+  .begin=_glx_begin,
+  .end=_glx_end,
   .set_fullscreen=_glx_set_fullscreen,
   .suppress_screensaver=_glx_suppress_screensaver,
 };

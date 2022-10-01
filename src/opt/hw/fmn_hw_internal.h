@@ -13,18 +13,15 @@ struct fmn_hw_mgr {
   struct fmn_hw_delegate delegate;
   
   struct fmn_hw_video_params video_params;
-  struct fmn_hw_render_params render_params;
   struct fmn_hw_audio_params audio_params;
   struct fmn_hw_synth_params synth_params;
   char *video_names;
   char *audio_names;
   char *input_names;
-  char *render_names;
   char *synth_names;
 
   struct fmn_hw_video *video;
   struct fmn_hw_audio *audio;
-  struct fmn_hw_render *render;
   struct fmn_hw_synth *synth;
   struct fmn_hw_input **inputv;
   int inputc,inputa;

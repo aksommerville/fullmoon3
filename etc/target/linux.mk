@@ -3,7 +3,7 @@
 linux_MIDDIR:=mid/linux
 linux_OUTDIR:=out/linux
 
-linux_OPT_ENABLE:=serial fs time genioc hw alsa evdev glx render_rgba
+linux_OPT_ENABLE:=serial fs time genioc hw alsa evdev glx render_rgba inmgr
 
 linux_CCDEF:=$(addprefix -DFMN_USE_,$(linux_OPT_ENABLE))
 linux_CCWARN:=-Werror -Wimplicit

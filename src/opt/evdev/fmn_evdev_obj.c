@@ -119,6 +119,7 @@ static int fmn_evdev_consider_file(struct fmn_hw_input *input,const char *base,i
   device->name[sizeof(device->name)-1]=0;
   char *p=device->name;
   for (i=sizeof(device->name);i-->0;p++) {
+    if (!*p) break;
     if ((*p<0x20)||(*p>0x7e)) *p='?';
   }
   
@@ -295,7 +296,7 @@ static int _evdev_enumerate(
     for (;minor<8;minor++,mask<<=1) {
       if (!(bits[major]&mask)) continue;
       int code=(major<<3)|minor;
-      int usage=0; //TODO Should we guess HID usage?
+      int usage=fmn_evdev_usage_from_code(EV_KEY,code);
       if (err=cb(input,devid,(EV_KEY<<16)|code,usage,0,1,0,userdata)) return err;
     }
   }
@@ -309,7 +310,7 @@ static int _evdev_enumerate(
         struct input_absinfo info={0};
         int code=(major<<3)|minor;
         ioctl(device->fd,EVIOCGABS(code),&info);
-        int usage=0; //TODO Should we guess HID usage?
+        int usage=fmn_evdev_usage_from_code(EV_ABS,code);
         if (err=cb(input,devid,(EV_ABS<<16)|code,usage,info.minimum,info.maximum,info.value,userdata)) return err;
       }
     }

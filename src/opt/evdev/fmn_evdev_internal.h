@@ -43,4 +43,6 @@ struct fmn_evdev_device *fmn_evdev_get_device_by_fd(const struct fmn_hw_input *i
 struct fmn_evdev_device *fmn_evdev_get_device_by_kid(const struct fmn_hw_input *input,int kid);
 struct fmn_evdev_device *fmn_evdev_get_device_by_devid(const struct fmn_hw_input *input,int devid);
 
+int fmn_evdev_usage_from_code(uint8_t type,uint16_t code);
+
 #endif

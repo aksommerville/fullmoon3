@@ -28,52 +28,14 @@ uint8_t fmn_platform_update() {
  * Platform and driver APIs are uncoincidentally similar.
  */
  
-void fmn_platform_video_upload_image(
-  uint16_t imageid,
-  struct fmn_image *image
-) {
-  if (!fmn_genioc.render) return;
-  fmn_hw_render_upload_image(fmn_genioc.render,imageid,image);
-}
- 
-void fmn_platform_video_begin() {
-  if (!fmn_genioc.render_begin) return;
-  fmn_genioc.render_begin(fmn_genioc.render);
+struct fmn_image *fmn_platform_video_begin() {
+  if (!fmn_genioc.video_begin) return 0;
+  return fmn_genioc.video_begin(fmn_genioc.video);
 }
 
-void fmn_platform_video_end() {
-  struct fmn_image *fb=0;
-  if (fmn_genioc.render_end) fb=fmn_genioc.render_end(fmn_genioc.render);
-  if (fmn_genioc.video_swap) fmn_genioc.video_swap(fmn_genioc.video,fb);
-}
-
-void fmn_platform_video_fill_rect(
-  int16_t x,int16_t y,int16_t w,int16_t h,
-  uint32_t rgba
-) {
-  if (!fmn_genioc.render_fill_rect) return;
-  fmn_genioc.render_fill_rect(fmn_genioc.render,x,y,w,h,rgba);
-}
-
-void fmn_platform_video_blit(
-  int16_t dstx,int16_t dsty,
-  uint16_t srcimageid,
-  int16_t srcx,int16_t srcy,
-  int16_t w,int16_t h,
-  uint8_t xform
-) {
-  if (!fmn_genioc.render_blit) return;
-  fmn_genioc.render_blit(fmn_genioc.render,dstx,dsty,srcimageid,srcx,srcy,w,h,xform);
-}
-
-void fmn_platform_video_blit_tile(
-  int16_t dstx,int16_t dsty,
-  uint16_t srcimageid,
-  uint8_t tileid,
-  uint8_t xform
-) {
-  if (!fmn_genioc.render_blit_tile) return;
-  fmn_genioc.render_blit_tile(fmn_genioc.render,dstx,dsty,srcimageid,tileid,xform);
+void fmn_platform_video_end(struct fmn_image *fb) {
+  if (!fmn_genioc.video_end) return;
+  fmn_genioc.video_end(fmn_genioc.video,fb);
 }
 
 void fmn_platform_audio_configure(const void *v,uint16_t c) {

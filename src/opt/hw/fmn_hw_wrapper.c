@@ -29,9 +29,14 @@ int fmn_hw_video_update(struct fmn_hw_video *video) {
   return video->type->update(video);
 }
 
-void fmn_hw_video_swap(struct fmn_hw_video *video,struct fmn_image *fb) {
-  if (!video->type->swap) return;
-  video->type->swap(video,fb);
+struct fmn_image *fmn_hw_video_begin(struct fmn_hw_video *video) {
+  if (!video->type->begin) return 0;
+  return video->type->begin(video);
+}
+
+void fmn_hw_video_end(struct fmn_hw_video *video,struct fmn_image *fb) {
+  if (!video->type->end) return;
+  video->type->end(video,fb);
 }
 
 int fmn_hw_video_set_fullscreen(struct fmn_hw_video *video,int fullscreen) {
@@ -47,64 +52,6 @@ int fmn_hw_video_set_fullscreen(struct fmn_hw_video *video,int fullscreen) {
 
 void fmn_hw_video_suppress_screensaver(struct fmn_hw_video *video) {
   if (video->type->suppress_screensaver) video->type->suppress_screensaver(video);
-}
-
-void fmn_hw_render_del(struct fmn_hw_render *render) {
-  if (!render) return;
-  if (render->type->del) render->type->del(render);
-  free(render);
-}
-
-struct fmn_hw_render *fmn_hw_render_new(
-  const struct fmn_hw_render_type *type,
-  const struct fmn_hw_delegate *delegate,
-  const struct fmn_hw_render_params *params
-) {
-  if (!type||!delegate) return 0;
-  struct fmn_hw_render *render=calloc(1,type->objlen);
-  if (!render) return 0;
-  render->type=type;
-  render->delegate=delegate;
-  if (type->init&&(type->init(render,params)<0)) {
-    fmn_hw_render_del(render);
-    return 0;
-  }
-  return render;
-}
-
-int fmn_hw_render_upload_image(struct fmn_hw_render *render,uint16_t imageid,struct fmn_image *image) {
-  if (!render->type->upload_image) return -1;
-  return render->type->upload_image(render,imageid,image);
-}
-
-int fmn_hw_render_begin(struct fmn_hw_render *render) {
-  if (!render->type->begin) return 0;
-  return render->type->begin(render);
-}
-
-struct fmn_image *fmn_hw_render_end(struct fmn_hw_render *render) {
-  if (!render->type->end) return 0;
-  return render->type->end(render);
-}
-
-void fmn_hw_render_fill_rect(struct fmn_hw_render *render,int x,int y,int w,int h,uint32_t rgba) {
-  if (!render->type->fill_rect) return;
-  render->type->fill_rect(render,x,y,w,h,rgba);
-}
-
-void fmn_hw_render_blit(
-  struct fmn_hw_render *render,int dstx,int dsty,
-  uint16_t imageid,int srcx,int srcy,
-  int w,int h,
-  uint8_t xform
-) {
-  if (!render->type->blit) return;
-  render->type->blit(render,dstx,dsty,imageid,srcx,srcy,w,h,xform);
-}
-
-void fmn_hw_render_blit_tile(struct fmn_hw_render *render,int dstx,int dsty,uint16_t imageid,uint8_t tileid,uint8_t xform) {
-  if (!render->type->blit_tile) return;
-  render->type->blit_tile(render,dstx,dsty,imageid,tileid,xform);
 }
 
 void fmn_hw_audio_del(struct fmn_hw_audio *audio) {

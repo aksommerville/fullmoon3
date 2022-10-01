@@ -11,7 +11,6 @@ void fmn_hw_mgr_del(struct fmn_hw_mgr *mgr) {
     fmn_hw_audio_del(mgr->audio);
   }
   fmn_hw_video_del(mgr->video);
-  fmn_hw_render_del(mgr->render);
   fmn_hw_synth_del(mgr->synth);
   if (mgr->inputv) {
     while (mgr->inputc-->0) fmn_hw_input_del(mgr->inputv[mgr->inputc]);
@@ -22,7 +21,6 @@ void fmn_hw_mgr_del(struct fmn_hw_mgr *mgr) {
   if (mgr->video_names) free(mgr->video_names);
   if (mgr->audio_names) free(mgr->audio_names);
   if (mgr->input_names) free(mgr->input_names);
-  if (mgr->render_names) free(mgr->render_names);
   if (mgr->synth_names) free(mgr->synth_names);
   
   free(mgr);
@@ -51,10 +49,6 @@ struct fmn_hw_video *fmn_hw_mgr_get_video(const struct fmn_hw_mgr *mgr) {
 
 struct fmn_hw_audio *fmn_hw_mgr_get_audio(const struct fmn_hw_mgr *mgr) {
   return mgr->audio;
-}
-
-struct fmn_hw_render *fmn_hw_mgr_get_render(const struct fmn_hw_mgr *mgr) {
-  return mgr->render;
 }
 
 struct fmn_hw_synth *fmn_hw_mgr_get_synth(const struct fmn_hw_mgr *mgr) {

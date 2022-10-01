@@ -36,42 +36,12 @@ uint8_t fmn_platform_update();
 #define FMN_BUTTON_B      0x20
 
 /* Video.
- * This interface could be implemented in software or with GX. Client shouldn't care.
  *****************************************************************/
-
-/* Assign a raw image, eg from resource manager, to a renderable texture.
- * Platform must copy the image. Caller is free to modify or delete it after upload.
- * (Immutable immortal images may of course be retained directly).
- */
-void fmn_platform_video_upload_image(
-  uint16_t imageid,
-  struct fmn_image *image
-);
  
 /* You should begin/end once per loop(), and all rendering calls must be between them.
  */
-void fmn_platform_video_begin();
-void fmn_platform_video_end();
-
-void fmn_platform_video_fill_rect(
-  int16_t x,int16_t y,int16_t w,int16_t h,
-  uint32_t rgba
-);
-
-void fmn_platform_video_blit(
-  int16_t dstx,int16_t dsty,
-  uint16_t srcimageid,
-  int16_t srcx,int16_t srcy,
-  int16_t w,int16_t h,
-  uint8_t xform
-);
-
-void fmn_platform_video_blit_tile(
-  int16_t dstx,int16_t dsty,
-  uint16_t srcimageid,
-  uint8_t tileid,
-  uint8_t xform
-);
+struct fmn_image *fmn_platform_video_begin();
+void fmn_platform_video_end(struct fmn_image *fb);
 
 /* Audio.
  *************************************************************/

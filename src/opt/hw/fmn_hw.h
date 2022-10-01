@@ -16,12 +16,10 @@ struct fmn_hw_delegate;
 struct fmn_hw_video;
 struct fmn_hw_audio;
 struct fmn_hw_input;
-struct fmn_hw_render;
 struct fmn_hw_synth;
 struct fmn_hw_video_type;
 struct fmn_hw_audio_type;
 struct fmn_hw_input_type;
-struct fmn_hw_render_type;
 struct fmn_hw_synth_type;
 
 /* Delegate.
@@ -78,7 +76,6 @@ int fmn_hw_mgr_ready(struct fmn_hw_mgr *mgr);
 void *fmn_hw_mgr_get_userdata(const struct fmn_hw_mgr *mgr);
 struct fmn_hw_video *fmn_hw_mgr_get_video(const struct fmn_hw_mgr *mgr);
 struct fmn_hw_audio *fmn_hw_mgr_get_audio(const struct fmn_hw_mgr *mgr);
-struct fmn_hw_render *fmn_hw_mgr_get_render(const struct fmn_hw_mgr *mgr);
 struct fmn_hw_synth *fmn_hw_mgr_get_synth(const struct fmn_hw_mgr *mgr);
 struct fmn_hw_input *fmn_hw_mgr_get_input(const struct fmn_hw_mgr *mgr,int p);
 
@@ -88,9 +85,12 @@ int fmn_hw_mgr_update(struct fmn_hw_mgr *mgr);
  *************************************************************/
  
 struct fmn_hw_video_params {
+// Constantish things from app config:
   const char *title;
   const void *iconrgba;
   int iconw,iconh;
+  int fbw,fbh;
+// Volatile current state:
   int fullscreen;
   int winw,winh;
 };
@@ -98,6 +98,7 @@ struct fmn_hw_video_params {
 struct fmn_hw_video {
   const struct fmn_hw_video_type *type;
   const struct fmn_hw_delegate *delegate;
+  int fbw,fbh;
   int winw,winh;
   int fullscreen;
 };
@@ -106,15 +107,16 @@ struct fmn_hw_video_type {
   const char *name;
   const char *desc;
   int by_request_only; // if nonzero, this type will never be chosen by default, only if you ask for it.
+  int provides_system_keyboard; // nonzero if we might trigger your 'key' and 'text' callbacks
   int objlen;
   void (*del)(struct fmn_hw_video *video);
   int (*init)(struct fmn_hw_video *video,const struct fmn_hw_video_params *params);
   int (*update)(struct fmn_hw_video *video);
   
-  /* Caller supplies (fb) if software rendering in play.
-   * Null if they've written to the global OpenGL context.
+  /* After a (begin), you must eventually return the same framebuffer to (end).
    */
-  void (*swap)(struct fmn_hw_video *video,struct fmn_image *fb);
+  struct fmn_image *(*begin)(struct fmn_hw_video *video);
+  void (*end)(struct fmn_hw_video *video,struct fmn_image *fb);
   
   void (*set_fullscreen)(struct fmn_hw_video *video,int fullscreen);
   void (*suppress_screensaver)(struct fmn_hw_video *video);
@@ -129,67 +131,10 @@ struct fmn_hw_video *fmn_hw_video_new(
 );
 
 int fmn_hw_video_update(struct fmn_hw_video *video);
-void fmn_hw_video_swap(struct fmn_hw_video *video,struct fmn_image *fb);
+struct fmn_image *fmn_hw_video_begin(struct fmn_hw_video *video);
+void fmn_hw_video_end(struct fmn_hw_video *video,struct fmn_image *fb);
 int fmn_hw_video_set_fullscreen(struct fmn_hw_video *video,int fullscreen);
 void fmn_hw_video_suppress_screensaver(struct fmn_hw_video *video);
-
-/* Render.
- ****************************************************************/
- 
-struct fmn_hw_render_params {
-  int fbw,fbh;
-  int tilesize;
-};
- 
-struct fmn_hw_render {
-  const struct fmn_hw_render_type *type;
-  const struct fmn_hw_delegate *delegate;
-  int fbw,fbh;
-};
-
-struct fmn_hw_render_type {
-  const char *name;
-  const char *desc;
-  int by_request_only;
-  int objlen;
-  void (*del)(struct fmn_hw_render *render);
-  int (*init)(struct fmn_hw_render *render,const struct fmn_hw_render_params *params);
-  int (*upload_image)(struct fmn_hw_render *render,uint16_t imageid,struct fmn_image *image);
-  int (*begin)(struct fmn_hw_render *render);
-  
-  /* Return (null) if rendering to OpenGL, otherwise the framebuffer.
-   */
-  struct fmn_image *(*end)(struct fmn_hw_render *render);
-  
-  void (*fill_rect)(struct fmn_hw_render *render,int x,int y,int w,int h,uint32_t rgba);
-  void (*blit)(
-    struct fmn_hw_render *render,int dstx,int dsty,
-    uint16_t imageid,int srcx,int srcy,
-    int w,int h,
-    uint8_t xform
-  );
-  void (*blit_tile)(struct fmn_hw_render *render,int dstx,int dsty,uint16_t imageid,uint8_t tileid,uint8_t xform);
-};
-
-void fmn_hw_render_del(struct fmn_hw_render *render);
-
-struct fmn_hw_render *fmn_hw_render_new(
-  const struct fmn_hw_render_type *type,
-  const struct fmn_hw_delegate *delegate,
-  const struct fmn_hw_render_params *params
-);
-
-int fmn_hw_render_upload_image(struct fmn_hw_render *render,uint16_t imageid,struct fmn_image *image);
-int fmn_hw_render_begin(struct fmn_hw_render *render);
-struct fmn_image *fmn_hw_render_end(struct fmn_hw_render *render);
-void fmn_hw_render_fill_rect(struct fmn_hw_render *render,int x,int y,int w,int h,uint32_t rgba);
-void fmn_hw_render_blit(
-  struct fmn_hw_render *render,int dstx,int dsty,
-  uint16_t imageid,int srcx,int srcy,
-  int w,int h,
-  uint8_t xform
-);
-void fmn_hw_render_blit_tile(struct fmn_hw_render *render,int dstx,int dsty,uint16_t imageid,uint8_t tileid,uint8_t xform);
 
 /* Audio.
  ********************************************************************/
@@ -341,8 +286,6 @@ const struct fmn_hw_audio_type *fmn_hw_audio_type_by_name(const char *name,int n
 const struct fmn_hw_audio_type *fmn_hw_audio_type_by_index(int p);
 const struct fmn_hw_input_type *fmn_hw_input_type_by_name(const char *name,int namec);
 const struct fmn_hw_input_type *fmn_hw_input_type_by_index(int p);
-const struct fmn_hw_render_type *fmn_hw_render_type_by_name(const char *name,int namec);
-const struct fmn_hw_render_type *fmn_hw_render_type_by_index(int p);
 const struct fmn_hw_synth_type *fmn_hw_synth_type_by_name(const char *name,int namec);
 const struct fmn_hw_synth_type *fmn_hw_synth_type_by_index(int p);
 

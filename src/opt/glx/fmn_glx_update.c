@@ -80,6 +80,7 @@ static int fmn_glx_evt_client(struct fmn_hw_video *video,XClientMessageEvent *ev
 static int fmn_glx_evt_configure(struct fmn_hw_video *video,XConfigureEvent *evt) {
   int nw=evt->width,nh=evt->height;
   if ((nw!=video->winw)||(nh!=video->winh)) {
+    VIDEO->dstdirty=1;
     video->winw=nw;
     video->winh=nh;
     if (video->delegate->resize) {

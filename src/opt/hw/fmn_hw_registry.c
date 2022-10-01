@@ -24,13 +24,6 @@ extern const struct fmn_hw_input_type fmn_hw_input_type_evdev;
 extern const struct fmn_hw_input_type fmn_hw_input_type_mshid;
 extern const struct fmn_hw_input_type fmn_hw_input_type_machid;
 
-extern const struct fmn_hw_render_type fmn_hw_render_type_nullrender;
-extern const struct fmn_hw_render_type fmn_hw_render_type_gl1;
-extern const struct fmn_hw_render_type fmn_hw_render_type_gl2;
-extern const struct fmn_hw_render_type fmn_hw_render_type_rgba;
-extern const struct fmn_hw_render_type fmn_hw_render_type_y2;
-extern const struct fmn_hw_render_type fmn_hw_render_type_bgr332;
-
 extern const struct fmn_hw_synth_type fmn_hw_synth_type_nullsynth;
 extern const struct fmn_hw_synth_type fmn_hw_synth_type_cheapsynth;
 extern const struct fmn_hw_synth_type fmn_hw_synth_type_nicesynth;
@@ -88,25 +81,6 @@ static const struct fmn_hw_input_type *fmn_hw_input_typev[]={
 #endif
 };
 
-static const struct fmn_hw_render_type *fmn_hw_render_typev[]={
-#if FMN_USE_gl1
-  &fmn_hw_render_type_gl1,
-#endif
-#if FMN_USE_gl2
-  &fmn_hw_render_type_gl2,
-#endif
-#if FMN_USE_render_rgba
-  &fmn_hw_render_type_rgba,
-#endif
-#if FMN_USE_render_y2
-  &fmn_hw_render_type_y2,
-#endif
-#if FMN_USE_render_bgr332
-  &fmn_hw_render_type_bgr332,
-#endif
-  &fmn_hw_render_type_nullrender,
-};
-
 static const struct fmn_hw_synth_type *fmn_hw_synth_typev[]={
 #if FMN_USE_nicesynth
   &fmn_hw_synth_type_nicesynth,
@@ -142,7 +116,6 @@ static const struct fmn_hw_synth_type *fmn_hw_synth_typev[]={
 ACCESSORS(video)
 ACCESSORS(audio)
 ACCESSORS(input)
-ACCESSORS(render)
 ACCESSORS(synth)
 #undef ACCESSORS
 

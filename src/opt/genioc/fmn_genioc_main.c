@@ -8,6 +8,7 @@ struct fmn_genioc fmn_genioc={0};
  
 static void fmn_genioc_cleanup() {
   fmn_hw_mgr_del(fmn_genioc.mgr);
+  fmn_inmgr_del(fmn_genioc.inmgr);
   memset(&fmn_genioc,0,sizeof(struct fmn_genioc));
 }
 
@@ -62,7 +63,6 @@ static void fmn_genioc_print_usage() {
     "  --help              Print this message.\n"
     "  --video=NAMES       Video drivers in order of preference.\n"
     "  --audio=NAMES       Audio ''.\n"
-    "  --render=NAMES      Render ''.\n"
     "  --synth=NAMES       Synth ''.\n"
     "  --input=NAMES       Input drivers, all will be initialized.\n"
     "  --audio-rate=HZ     Audio output rate.\n"
@@ -82,7 +82,6 @@ static void fmn_genioc_print_usage() {
     fprintf(stderr,"\n"); \
   }
   fprintf(stderr,"Video drivers:\n"); LIST_DRIVERS(video)
-  fprintf(stderr,"Render drivers:\n"); LIST_DRIVERS(render)
   fprintf(stderr,"Audio drivers:\n"); LIST_DRIVERS(audio)
   fprintf(stderr,"Synth drivers:\n"); LIST_DRIVERS(synth)
   fprintf(stderr,"Input drivers:\n"); LIST_DRIVERS(input)
@@ -102,15 +101,9 @@ static int fmn_genioc_config(struct fmn_hw_mgr *mgr,const char *k,int kc,const c
  
 static int fmn_genioc_yoink_common_hooks() {
 
-  if (!(fmn_genioc.render=fmn_hw_mgr_get_render(fmn_genioc.mgr))) return -1;
-  fmn_genioc.render_begin=fmn_genioc.render->type->begin;
-  fmn_genioc.render_end=fmn_genioc.render->type->end;
-  fmn_genioc.render_fill_rect=fmn_genioc.render->type->fill_rect;
-  fmn_genioc.render_blit=fmn_genioc.render->type->blit;
-  fmn_genioc.render_blit_tile=fmn_genioc.render->type->blit_tile;
-  
   if (!(fmn_genioc.video=fmn_hw_mgr_get_video(fmn_genioc.mgr))) return -1;
-  fmn_genioc.video_swap=fmn_genioc.video->type->swap;
+  fmn_genioc.video_begin=fmn_genioc.video->type->begin;
+  fmn_genioc.video_end=fmn_genioc.video->type->end;
   
   if (!(fmn_genioc.audio=fmn_hw_mgr_get_audio(fmn_genioc.mgr))) return -1;
   fmn_genioc.audio_lock=fmn_genioc.audio->type->lock;
@@ -125,6 +118,12 @@ static int fmn_genioc_yoink_common_hooks() {
 int main(int argc,char **argv) {
 
   signal(SIGINT,fmn_genioc_rcvsig);
+  
+  struct fmn_inmgr_delegate indelegate={
+    .state=fmn_genioc_inmgr_state,
+    .action=fmn_genioc_inmgr_action,
+  };
+  if (!(fmn_genioc.inmgr=fmn_inmgr_new(&indelegate))) return 1;
 
   struct fmn_hw_delegate delegate={
     .config=fmn_genioc_config,
@@ -146,6 +145,11 @@ int main(int argc,char **argv) {
   if (fmn_genioc.terminate) return 0;
   if (fmn_hw_mgr_ready(fmn_genioc.mgr)<0) return 1;
   if (fmn_genioc_yoink_common_hooks()<0) return 1;
+  
+  if (fmn_genioc.video&&fmn_genioc.video->type->provides_system_keyboard) {
+    fmn_genioc.devid_keyboard=fmn_hw_devid_next();
+    fmn_inmgr_connect(fmn_genioc.inmgr,0,fmn_genioc.devid_keyboard);
+  }
   
   setup();
   fmn_genioc_clock_begin();
