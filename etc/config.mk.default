@@ -1,0 +1,8 @@
+# config.mk
+# Settings particular to your installation.
+# These will be ignored by git.
+
+# FMN_TARGETS names files under etc/target/ to build for.
+FMN_TARGETS:=linux
+
+run:linux-run
