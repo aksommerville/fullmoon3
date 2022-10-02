@@ -40,6 +40,7 @@
 
 #define FMN_IMAGE_FLAG_TRANSPARENT 0x01 /* Uses a color key (value depends on fmt) */
 #define FMN_IMAGE_FLAG_WRITEABLE   0x02
+#define FMN_IMAGE_FLAG_OWNV        0x04
 
 #define FMN_XFORM_XREV 1
 #define FMN_XFORM_YREV 2
@@ -70,11 +71,18 @@ uint32_t fmn_pixel_from_rgba(uint8_t fmt,uint8_t r,uint8_t g,uint8_t b,uint8_t a
 void fmn_image_fill_rect(struct fmn_image *image,int16_t x,int16_t y,int16_t w,int16_t h,uint32_t pixel);
 
 /* Blitting may only be done between images of like format.
+ * For "tile", (dstx,dsty) is the center of output, and size is inferred from (src).
  */
 void fmn_image_blit(
   struct fmn_image *dst,int16_t dstx,int16_t dsty,
-  struct fmn_image *src,int16_t srcx,int16_t srcy,
+  const struct fmn_image *src,int16_t srcx,int16_t srcy,
   int16_t w,int16_t h,
+  uint8_t xform
+);
+void fmn_image_blit_tile(
+  struct fmn_image *dst,int16_t dstx,int16_t dsty,
+  const struct fmn_image *src,
+  uint8_t tileid,
   uint8_t xform
 );
 

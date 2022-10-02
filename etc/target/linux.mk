@@ -19,8 +19,9 @@ linux_SRCFILES:= \
 
 linux_SRCFILES_DATA:=$(filter src/data/%,$(linux_SRCFILES))
 linux_MIDFILES_DATA:=$(patsubst src/%,$(linux_MIDDIR)/%.c,$(linux_SRCFILES_DATA))
-#TODO Rules for specific data types.
-$(linux_MIDDIR)/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$<
+#TODO Image format. Eventually, linux should get images in every format, figure out how that's going to work.
+$(linux_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2
+$(linux_MIDDIR)/data/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$<
 
 linux_CFILES:=$(filter %.c,$(linux_SRCFILES) $(linux_MIDFILES_DATA))
 linux_OFILES:=$(patsubst src/%,$(linux_MIDDIR)/%,$(addsuffix .o,$(basename $(linux_CFILES))))

@@ -83,7 +83,7 @@ void fmn_image_fill_rect(struct fmn_image *image,int16_t x,int16_t y,int16_t w,i
  
 void fmn_image_blit(
   struct fmn_image *dst,int16_t dstx,int16_t dsty,
-  struct fmn_image *src,int16_t srcx,int16_t srcy,
+  const struct fmn_image *src,int16_t srcx,int16_t srcy,
   int16_t w,int16_t h,
   uint8_t xform
 ) {
@@ -283,4 +283,23 @@ void fmn_image_blit(
     #endif
     
   }
+}
+
+/* Blit tile (convenience).
+ */
+ 
+void fmn_image_blit_tile(
+  struct fmn_image *dst,int16_t dstx,int16_t dsty,
+  const struct fmn_image *src,
+  uint8_t tileid,
+  uint8_t xform
+) {
+  if (!src) return;
+  int16_t tilesize=src->w>>4;
+  fmn_image_blit(
+    dst,dstx-(tilesize>>1),dsty-(tilesize>>1),
+    src,(tileid&15)*tilesize,(tileid>>4)*tilesize,
+    tilesize,tilesize,
+    xform
+  );
 }

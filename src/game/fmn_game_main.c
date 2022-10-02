@@ -9,6 +9,9 @@
 #define WORLDW 96
 #define WORLDH 64
 
+extern const struct fmn_image fmnr_image_hero;
+extern const struct fmn_image fmnr_image_outdoors;
+
 static uint8_t image_rgba_pixels[]={
 #define _ 0,0,0,0,
 #define K 0,0,0,255,
@@ -99,7 +102,8 @@ static struct sprite {
   int16_t x,y;
   int16_t dx,dy;
   uint8_t xform;
-  struct fmn_image *image;
+  uint8_t tileid;
+  const struct fmn_image *image;
 } spritev[SPRITEC];
 
 void setup() {
@@ -121,6 +125,12 @@ void setup() {
       case FMN_IMAGE_FMT_Y8: sprite->image=&image_y8; break;
       case FMN_IMAGE_FMT_Y2: sprite->image=&image_y2; break;
     }
+    sprite->image=&fmnr_image_hero;
+    switch (rand()%3) {
+      case 0: sprite->tileid=0x11; break;
+      case 1: sprite->tileid=0x13; break;
+      case 2: sprite->tileid=0x21; break;
+    }
   }
 }
 
@@ -140,29 +150,32 @@ void loop() {
   
   struct sprite *sprite=spritev;
   int i=SPRITEC;
+  int tilesize=8;
   if (!(input&FMN_BUTTON_A)) {
   for (;i-->0;sprite++) {
     sprite->x+=sprite->dx;
     sprite->y+=sprite->dy;
     if (sprite->dx<0) {
-      if (sprite->x+sprite->image->w<=0) sprite->x+=WORLDW+sprite->image->w;
+      if (sprite->x+tilesize<=0) sprite->x+=WORLDW+tilesize;
     } else {
-      if (sprite->x>=WORLDW) sprite->x-=WORLDW+sprite->image->w;
+      if (sprite->x>=WORLDW) sprite->x-=WORLDW+tilesize;
     }
     if (sprite->dy<0) {
-      if (sprite->y+sprite->image->h<=0) sprite->y+=WORLDH+sprite->image->h;
+      if (sprite->y+tilesize<=0) sprite->y+=WORLDH+tilesize;
     } else {
-      if (sprite->y>=WORLDH) sprite->y-=WORLDH+sprite->image->h;
+      if (sprite->y>=WORLDH) sprite->y-=WORLDH+tilesize;
     }
   }
   }
   
   struct fmn_image *fb=fmn_platform_video_begin();
   if (fb) {
-    fmn_image_fill_rect(fb,0,0,fb->w,fb->h,fmn_pixel_from_rgba(fb->fmt,0xff,0x80,0x00,0xff));
+    //fmn_image_fill_rect(fb,0,0,fb->w,fb->h,fmn_pixel_from_rgba(fb->fmt,0xff,0x80,0x00,0xff));
+    fmn_image_blit(fb,0,0,&fmnr_image_outdoors,0,0,fb->w,fb->h,0);
   
     for (sprite=spritev,i=SPRITEC;i-->0;sprite++) {
-      fmn_image_blit(fb,sprite->x,sprite->y,sprite->image,0,0,sprite->image->w,sprite->image->h,sprite->xform);
+      //fmn_image_blit(fb,sprite->x,sprite->y,sprite->image,0,0,sprite->image->w,sprite->image->h,sprite->xform);
+      fmn_image_blit_tile(fb,sprite->x+4,sprite->y+4,sprite->image,sprite->tileid,sprite->xform);
     }
   
     // A little white-in-blue box you can move with the dpad.

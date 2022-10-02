@@ -94,17 +94,13 @@ tiny_SRCFILES:= \
 tiny_DATA_SRC:=$(filter src/data/%,$(tiny_SRCFILES))
 tiny_DATA_SRC:=$(filter-out src/data/tiles/%,$(tiny_DATA_SRC)) $(filter src/data/tiles/8c/%,$(tiny_DATA_SRC))
 tiny_DATA_SRC:=$(filter-out src/data/meta/%,$(tiny_DATA_SRC))
-tiny_DATA_MID:=$(patsubst src/%,$(tiny_MIDDIR)/%.bin,$(tiny_DATA_SRC))
+tiny_DATA_MID:=$(patsubst src/%,$(tiny_MIDDIR)/%.c,$(tiny_DATA_SRC))
 tiny_MENU_SPLASH:=$(tiny_OUTDIR)/fullmoon.tsv
 
-# TODO data assembly
-#$(tiny_MIDDIR)/data/%.png.bin:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --mode=$(tiny_IMAGE_MODE)
-#$(tiny_MIDDIR)/data/map/%.bin:src/data/map/% $(tool_EXE_mapcvt);$(PRECMD) $(tool_EXE_mapcvt) -o$@ -i$<
-#$(tiny_MIDDIR)/data/%.bin:src/data/%;$(PRECMD) cp $< $@
-#$(tiny_DATA_OUT):$(tiny_DATA_MID) $(tool_EXE_archive);$(PRECMD) $(tool_EXE_archive) -o$@ $(tiny_DATA_MID)
-#$(tiny_MENU_SPLASH):src/data/meta/tiny-splash.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --mode=TINY16 # regardless of app mode
+$(tiny_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2 --progmem=1
+$(tiny_MIDDIR)/data/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$< --progmem=1
 
-tiny_CFILES:=$(filter %.c %.cpp %.S,$(tiny_SRCFILES)) $(tiny_EXTFILES)
+tiny_CFILES:=$(filter %.c %.cpp %.S,$(tiny_SRCFILES) $(tiny_DATA_MID)) $(tiny_EXTFILES)
 tiny_OFILES:=$(patsubst src/%,$(tiny_MIDDIR)/%, \
   $(patsubst $(tiny_ARDUINO_IDE_HOME)/%,$(tiny_MIDDIR)/%, \
   $(patsubst $(tiny_ARDUINO_HOME)/%,$(tiny_MIDDIR)/%, \

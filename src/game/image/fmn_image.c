@@ -17,7 +17,7 @@ void fmn_image_del(struct fmn_image *image) {
   if (!image) return;
   if (!image->refc) return;
   if (image->refc-->1) return;
-  if (image->v) free(image->v);
+  if (image->v&&(image->flags&FMN_IMAGE_FLAG_OWNV)) free(image->v);
   free(image);
 }
 
