@@ -1,0 +1,30 @@
+Full Moon Map Format
+
+Maps encoded for distribution are live C objects.
+See src/game/map/fmn_map.h.
+
+Before conversion they are plain text.
+Begins with 8 lines of 24 hexadecimal digits each.
+
+After that are loose commands. Order matters.
+
+=== commands ===
+
+tilesheet IMAGEID
+
+song SONGID
+
+hero X Y
+
+neighborw MAPID
+neighbore MAPID
+neighborn MAPID
+neighbors MAPID
+
+home MAPID
+
+event EVID HOOKID [ARGS...]
+
+sprite X Y SPRITECTLID [ARGS...]
+
+cellif FLAGID X Y TILEID

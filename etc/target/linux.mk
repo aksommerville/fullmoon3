@@ -25,6 +25,7 @@ linux_MIDFILES_DATA:=$(patsubst src/%,$(linux_MIDDIR)/%.c,$(linux_SRCFILES_DATA)
 $(linux_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2
 $(linux_MIDDIR)/data/waves.txt.c:src/data/waves.txt $(tool_EXE_waves);$(PRECMD) $(tool_EXE_waves) -o$@ -i$< --name=fmnr_waves
 $(linux_MIDDIR)/data/%.mid.c:src/data/%.mid $(tool_EXE_songcvt);$(PRECMD) $(tool_EXE_songcvt) -o$@ -i$< --adjust=src/data/$*.adjust
+$(linux_MIDDIR)/data/map/%.c:src/data/map/% $(tool_EXE_mapcvt);$(PRECMD) $(tool_EXE_mapcvt) -o$@ -i$<
 $(linux_MIDDIR)/data/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$<
 
 linux_CFILES:=$(filter %.c,$(linux_SRCFILES) $(linux_MIDFILES_DATA))

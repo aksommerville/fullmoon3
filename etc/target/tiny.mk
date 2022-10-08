@@ -105,7 +105,8 @@ tiny_MENU_SPLASH:=$(tiny_OUTDIR)/fullmoon.tsv
 $(tiny_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2 --progmem=1
 $(tiny_MIDDIR)/data/waves.txt.c:src/data/waves.txt $(tool_EXE_waves);$(PRECMD) $(tool_EXE_waves) -o$@ -i$< --progmem=1 --name=fmnr_waves
 $(tiny_MIDDIR)/data/%.mid.c:src/data/%.mid $(tool_EXE_songcvt);$(PRECMD) $(tool_EXE_songcvt) -o$@ -i$< --progmem=1 --adjust=src/data/$*.adjust
-#$(tiny_MIDDIR)/data/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$< --progmem=1
+$(tiny_MIDDIR)/data/map/%.c:src/data/map/% $(tool_EXE_mapcvt);$(PRECMD) $(tool_EXE_mapcvt) -o$@ -i$< --progmem=1
+$(tiny_MIDDIR)/data/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$< --progmem=1
 
 tiny_CFILES:=$(filter %.c %.cpp %.S,$(tiny_SRCFILES) $(tiny_DATA_MID)) $(tiny_EXTFILES)
 tiny_OFILES:=$(patsubst src/%,$(tiny_MIDDIR)/%, \
