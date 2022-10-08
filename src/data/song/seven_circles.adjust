@@ -1,0 +1,3 @@
+map track=1 chan=0 => chan=1
+map track=2 chan=0 => chan=2
+end 4

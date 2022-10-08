@@ -22,6 +22,8 @@ int fmn_int_eval(int *dst,const char *src,int srcc);
 
 int fmn_for_each_comma_string(const char *src,int srcc,int (*cb)(const char *src,int srcc,void *userdata),void *userdata);
 
+int fmn_vlq_decode(int *dst,const void *src,int srcc);
+
 /* Encoder.
  ******************************************************/
  
@@ -36,6 +38,8 @@ int fmn_encoder_replace(struct fmn_encoder *encoder,int p,int c,const void *src,
 
 int fmn_encode_raw(struct fmn_encoder *encoder,const void *src,int srcc);
 int fmn_encode_fmt(struct fmn_encoder *encoder,const char *fmt,...);
+
+int fmn_encode_u8(struct fmn_encoder *encoder,uint8_t src);
 
 /* Decoder.
  ******************************************************/

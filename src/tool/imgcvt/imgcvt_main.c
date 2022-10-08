@@ -40,12 +40,12 @@ int main(int argc,char **argv) {
   int serialc=fmn_file_read(&serial,imgcvt.cmdline.srcpathv[0]);
   if (serialc<0) {
     fprintf(stderr,"%s: Failed to read file.\n",imgcvt.cmdline.srcpathv[0]);
-    return -2;
+    return 1;
   }
   
   if ((err=fmn_png_decode(&imgcvt.image,serial,serialc,imgcvt.cmdline.srcpathv[0]))<0) {
     if (err!=-2) fprintf(stderr,"%s: Unspecified error decoding PNG\n",imgcvt.cmdline.srcpathv[0]);
-    return -2;
+    return 1;
   }
   
   if ((err=imgcvt_reformat_image())<0) {

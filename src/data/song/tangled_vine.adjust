@@ -1,0 +1,12 @@
+mode 1 voice 1
+env 1 lo 40 0x2000 20 0x0800 200
+env 1 hi  5 0x3000 10 0x1000 600
+
+mode 2 voice 0
+env 2 lo 60 0x1000 50 0x0600 100
+env 2 hi 20 0x2800 40 0x0c00 200
+
+map track=1 chan=0 => chan=1
+map track=2 chan=0 => chan=2
+end 4
+#debug events

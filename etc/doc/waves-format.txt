@@ -1,0 +1,34 @@
+Format for cheapsynth waves source.
+
+Line-oriented text file.
+A wave chunk begins with a line: wave ID
+ID is for validation only; they must be sequential from zero.
+
+Within a wave chunk, each line is some operation to perform on the buffer.
+The buffer is initially a sine wave.
+
+sine
+  Overwrite buffer with a sine wave.
+  (redundant, this is the initial state anyway)
+  
+noise
+  Overwrite buffer with random noise.
+  This may be a different result every time, so probably not useful.
+  I use it as kind of an "unused assertion", ensure if this wave gets used, I'll notice.
+  
+harmonics [COEFFICIENTS...]
+  Play the current buffer at several harmonic frequencies and combine.
+  COEFFICIENTS in 0..999.
+  eg:
+    harmonics 999 # no-op
+    harmonics 0 # force silence
+    harmonics 999 0 333 0 200 0 142 0 111 0 100 # approach square wave
+
+normalize [LEVEL]
+  Scale values such that the highest will be LEVEL (default 999).
+  LEVEL in 0..999.
+  I recommend ending every wave with this.
+
+gain WHOLE FRACT [CLIP [GATE]]
+  Scale values by a constant, then optionally clip high and low.
+  (FRACT,CLIP,GATE) in 0..999, because I don't feel like parsing floats.

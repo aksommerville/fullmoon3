@@ -1,0 +1,113 @@
+Full Moon Song Format
+
+This is for the "cheapsynth" synthesizer. Right now that's the only one I've made.
+Future synthesizers might use a different format.
+
+Like MIDI, our model is 16 channels, each of which can play 128 independent notes.
+The channels are shared with the application (eg sound effects).
+I recommend a convention that songs use channels 0..9, and the application 10..15.
+
+For best efficiency, use the one-off "Note" command.
+This can only use noteid 0x20..0x5f, 5 bits of velocity, and duration 0..63 ticks.
+If you need longer sustain, notes at the far high or low end, or fine-grained velocity, use the MIDI-like Note On and Note Off commands.
+In either case, we don't have concept of Off Velocity.
+
+"Config" commands modify channel state with 8-bit key and value.
+There is no concept of programs. The entire channel state is defined with Config commands.
+  0x00 Reset all config for channel.
+  0x01 Voice Type:
+        0 Disable
+        1 Square
+        2 Wave table
+        3 PCM
+  0x02 waveid (VT 2)
+  0x03 attack time, ms. (VT 1,2)
+  0x04 attack level
+  0x05 decay time, ms. (VT 1,2)
+  0x06 sustain level
+  0x07 release time, 8ms. (VT 1,2)
+  0x08 max attack time
+  0x09 max attack level
+  0x0a max decay time
+  0x0b max sustain level
+  0x0c max release time
+  
+Envelope commands 0x03..0x07 set for both minimum and maxmimum velocity.
+Their partners 0x08..0x0c set for maximum velocity only.
+So set the minimums first, then the maximums if you want velocity articulation.
+
+It is possible to reconfigure channels on the fly, but for now at least, I'm enforcing a convention that they be configured only at the start.
+So, the "adjust" files declare channel config globally, and those commands go in the lead part, before the loop.
+Control Change and Program Change from the MIDI files will be ignored.
+We can revisit this decision later if it feels oppressive.
+
+Song begins with a 4-byte header:
+  u8 Tempo, ms/tick
+  u8 Start position, in bytes from start of header (ie header length, ie 4)
+  u16 Loop position, in bytes from start of header. Must be >= start position.
+  
+Followed by commands identifiable by their leading byte.
+
+0000 0000                      : EOF
+0ttt tttt                      : Delay (t) ticks.
+100v vvvv  nnnn nndd  dddd cccc: Note: (v)elocity, (n)oteid, (d)uration, (c)hannel.
+1010 cccc  kkkk kkkk  vvvv vvvv: Config: (c)hannel, (k)ey, (v)alue.
+1011 cccc  0nnn nnnn  0vvv vvvv: Note On: (c)hannel, (n)oteid, (v)elocity.
+1100 cccc  0nnn nnnn           : Note Off: (c)hannel, (n)oteid.
+1101 xxxx: Reserved.
+110x xxxx: Reserved.
+111x xxxx: Reserved.
+
+It is important that Note and Note On be the same length.
+
+===== Adjustment Files =====
+
+Each MIDI file may have a "*.adjust" file adjacent to it.
+This is a text file describing actions to take during conversion.
+
+Each line is processed individually, in order.
+Tokens are delimited by whitespace. First token is the command.
+
+debug [file|events|all]
+  Dump diagnostics.
+
+map [CRITERIA] => [CHANGES]
+  Force the given changes on every event matching all CRITERIA.
+  CRITERIA:
+    track=INT
+    chan=INT # NB 0-based, where MIDI is usually 1-based.
+    opcode=INT
+    note=INT # will only apply to Note On, Note Off, Note Adjust
+  CHANGES:
+    chan=INT
+    opcode=INT # eg zero to neuter an event
+    a=INT # first data byte
+    b=INT # second data byte
+
+end PAD
+  Force end of song to the time of the last Note Off, padded out to a multiple of PAD qnotes.
+  Zero is fine, that means end immediately at Note Off.
+  Typical: "end 4"
+  If unspecified, the song's length is based on the last event (even if you modify that event).
+
+rate INT
+  Force output rate in ms/tick 1..255.
+  This bears on time quantization and file size, but not tempo.
+  Probably you want to leave it automatic.
+
+tempo INT
+  Force input tempo, us/qnote.
+  If unset, we read this from Meta Set Tempo, or default to 500000 (120 bpm).
+
+mode CHID disable
+mode CHID square
+mode CHID voice WAVEID
+mode CHID pcm
+  Set mode for one channel. This will be established at the song's start.
+  "pcm" mode currently doesn't do anything.
+  
+env CHID [lo] ATKTIME ATKLEVEL DECTIME SUSLEVEL RLSTIME
+env CHID hi ATKTIME ATKLEVEL DECTIME SUSLEVEL RLSTIME
+  Set envelope for one channel.
+  "lo" and "hi" are minimum and maximum velocity, we interpolate between them.
+  Times in ms, and levels in 0..0xffff

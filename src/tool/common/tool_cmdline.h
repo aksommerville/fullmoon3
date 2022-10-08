@@ -31,6 +31,7 @@ int tool_cmdline_one_output(struct tool_cmdline *cmdline);
 
 /* Getting as int returns zero if missing or malformed.
  * As boolean, missing is zero, empty is 1, malformed is -1.
+ * Option values that exist are always NUL-terminated.
  */
 struct tool_option *tool_cmdline_get_option_struct(const struct tool_cmdline *cmdline,const char *k,int kc);
 int tool_cmdline_get_option(void *dstpp,const struct tool_cmdline *cmdline,const char *k,int kc);

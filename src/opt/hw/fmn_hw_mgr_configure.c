@@ -271,6 +271,7 @@ static int fmn_hw_mgr_init_video(struct fmn_hw_mgr *mgr) {
  
 static int fmn_hw_mgr_init_audio_type(struct fmn_hw_mgr *mgr,const struct fmn_hw_audio_type *type) {
   if (!(mgr->audio=fmn_hw_audio_new(type,&mgr->delegate,&mgr->audio_params))) return 0;
+  mgr->audio->mgr=mgr;
   return 1;
 }
 
@@ -343,6 +344,8 @@ static int fmn_hw_mgr_init_audio(struct fmn_hw_mgr *mgr) {
     return -2;
   }
   fprintf(stderr,"Using synthesizer '%s'\n",mgr->synth->type->name);
+  
+  if (fmn_hw_audio_play(mgr->audio,1)<0) return -1;
   
   return 0;
 }

@@ -11,6 +11,10 @@
 
 extern const struct fmn_image fmnr_image_hero;
 extern const struct fmn_image fmnr_image_outdoors;
+extern const uint8_t fmnr_song_tangled_vine[];
+extern const uint16_t fmnr_song_tangled_vine_length;
+extern const uint8_t fmnr_song_seven_circles[];
+extern const uint16_t fmnr_song_seven_circles_length;
 
 static uint8_t image_rgba_pixels[]={
 #define _ 0,0,0,0,
@@ -106,6 +110,29 @@ static struct sprite {
   const struct fmn_image *image;
 } spritev[SPRITEC];
 
+static const uint8_t my_fake_song[]={
+  100, // tempo, ms/tick
+  4,0,4,
+  
+  /*
+0000 0000                      : EOF
+0ttt tttt                      : Delay (t) ticks.
+100v vvvv  nnnn nndd  dddd cccc: Note: (v)elocity, (n)oteid, (d)uration, (c)hannel.
+1010 cccc  kkkk kkkk  vvvv vvvv: Config: (c)hannel, (k)ey, (v)alue.
+1011 cccc  0nnn nnnn  0vvv vvvv: Note On: (c)hannel, (n)oteid, (v)elocity.
+1100 cccc  0nnn nnnn           : Note Off: (c)hannel, (n)oteid.
+  */
+  0x90,0x10,0x10,
+  0x02,
+  0x90,0x1c,0x10,
+  0x02,
+  0x90,0x2c,0x10,
+  0x02,
+  0x90,0x40,0x10,
+  0x02,
+  0x00,
+};
+
 void setup() {
   srand(time(0));
   
@@ -132,9 +159,14 @@ void setup() {
       case 2: sprite->tileid=0x21; break;
     }
   }
+  
+  fmn_platform_audio_play_song(fmnr_song_tangled_vine,fmnr_song_tangled_vine_length);
+  //fmn_platform_audio_play_song(fmnr_song_seven_circles,fmnr_song_seven_circles_length);
+  //fmn_platform_audio_play_song(my_fake_song,sizeof(my_fake_song));
 }
 
 static int16_t x=1,y=1;
+static uint8_t pvinput=0;
 
 void loop() {
   uint8_t input=fmn_platform_update();
@@ -146,6 +178,12 @@ void loop() {
   switch (input&(FMN_BUTTON_UP|FMN_BUTTON_DOWN)) {
     case FMN_BUTTON_UP: if (y>0) y--; break;
     case FMN_BUTTON_DOWN: if (y<61) y++; break;
+  }
+  
+  if (input!=pvinput) {
+    if ((input&FMN_BUTTON_A)&&!(pvinput&FMN_BUTTON_A)) fmn_platform_audio_note(0,0x40,0x40,0);
+    if ((input&FMN_BUTTON_B)&&!(pvinput&FMN_BUTTON_B)) fmn_platform_audio_note(0,0x47,0x40,100);
+    pvinput=input;
   }
   
   struct sprite *sprite=spritev;

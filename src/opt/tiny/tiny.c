@@ -3,15 +3,15 @@
  * I don't understand most of it.
  */
 
-#define AUDIO_RATE 22050
+#define AUDIO_RATE 11025
 
 #include <stdint.h>
 #include "api/fmn_platform.h"
 #include "game/image/fmn_image.h"
 
-#if FMN_USE_synth && 0 /* TODO */
+#if FMN_USE_cheapsynth
   #define FMN_AUDIO_ENABLE 1
-  #include "opt/synth/synth.h"
+  #include "opt/cheapsynth/fmn_cheapsynth.h"
 #else
   #define FMN_AUDIO_ENABLE 0
 #endif
@@ -133,10 +133,8 @@ static void tcReset() {
 static void tiny_audio_init() {
 
   #if FMN_AUDIO_ENABLE
-    #if FMN_USE_minisyni
-      minisyni_init(AUDIO_RATE);
-    #elif FMN_USE_synth
-      synth_init(AUDIO_RATE);
+    #if FMN_USE_cheapsynth
+      fmn_cheapsynth_init(AUDIO_RATE,1);
     #endif
   #endif
   // Proceed with the rest even if disabled, it seems to be necessary.
@@ -180,7 +178,7 @@ static int16_t fmn_abuf[FMN_AUDIO_BUFFER_SIZE]={0};
 // (rp==wp) means empty.
 static uint16_t fmn_abuf_rp=0,fmn_abuf_wp=0;
 
-uint16_t fmn_platform_get_audio_buffer(int16_t **dstpp) {
+static uint16_t tiny_get_audio_buffer(int16_t **dstpp) {
   uint16_t p=fmn_abuf_wp;
   if (p>=FMN_AUDIO_BUFFER_SIZE) p=0;
   *dstpp=fmn_abuf+p;
@@ -188,7 +186,7 @@ uint16_t fmn_platform_get_audio_buffer(int16_t **dstpp) {
   return FMN_AUDIO_BUFFER_SIZE-p;
 }
 
-void fmn_platform_filled_audio_buffer(int16_t *v,uint16_t c) {
+static void tiny_filled_audio_buffer(int16_t *v,uint16_t c) {
   if (fmn_abuf_wp>=FMN_AUDIO_BUFFER_SIZE) fmn_abuf_wp=0;
   if (v!=fmn_abuf+fmn_abuf_wp) return; // ...the hell you did
   fmn_abuf_wp+=c;
@@ -476,25 +474,21 @@ uint8_t fmn_platform_update() {
     return 0;
   }
 
-  /**/
   throttlecounter++;
   if (throttlecounter>=3) {
     throttlecounter=0;
     delay(15);
   }
-  /**/
   
   #if FMN_AUDIO_ENABLE
     int16_t *buf=0;
-    uint16_t bufc=fmn_platform_get_audio_buffer(&buf);
-    #if FMN_USE_minisyni
-      minisyni_update(buf,bufc);
-    #elif FMN_USE_synth
-      synth_update(buf,bufc);
+    uint16_t bufc=tiny_get_audio_buffer(&buf);
+    #if FMN_USE_cheapsynth
+      fmn_cheapsynth_update(buf,bufc);
     #else
       memset(buf,0,bufc<<1);
     #endif
-    fmn_platform_filled_audio_buffer(buf,bufc);
+    tiny_filled_audio_buffer(buf,bufc);
   #endif
 
   uint8_t state=0;
@@ -570,3 +564,29 @@ void fmn_platform_video_end(struct fmn_image *fb) {
 void fmn_platform_terminate(uint8_t status) {
   tiny_terminate=1;
 }
+
+/* Public audio entry points.
+ */
+
+#if FMN_USE_cheapsynth
+  void fmn_platform_audio_configure(const void *v,uint16_t c) {
+  }
+  void fmn_platform_audio_play_song(const void *v,uint16_t c) {
+    fmn_cheapsynth_play_song(v,c);
+  }
+  void fmn_platform_audio_note(uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms) {
+    fmn_cheapsynth_note(programid,noteid,velocity,duration_ms);
+  }
+  void fmn_platform_audio_silence() {
+    fmn_cheapsynth_silence();
+  }
+  void fmn_platform_audio_release_all() {
+    fmn_cheapsynth_release_all();
+  }
+#else
+  void fmn_platform_audio_configure(const void *v,uint16_t c) {}
+  void fmn_platform_audio_play_song(const void *v,uint16_t c) {}
+  void fmn_platform_audio_note(uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms) {}
+  void fmn_platform_audio_silence() {}
+  void fmn_platform_audio_release_all() {}
+#endif

@@ -3,7 +3,7 @@
 linux_MIDDIR:=mid/linux
 linux_OUTDIR:=out/linux
 
-linux_OPT_ENABLE:=serial fs time genioc hw alsa evdev glx render_rgba inmgr
+linux_OPT_ENABLE:=serial fs time genioc hw alsa evdev glx inmgr cheapsynth
 
 linux_CCDEF:=$(addprefix -DFMN_USE_,$(linux_OPT_ENABLE))
 linux_CCWARN:=-Werror -Wimplicit
@@ -18,9 +18,13 @@ linux_SRCFILES:= \
   $(filter $(addprefix src/opt/,$(addsuffix /%,$(linux_OPT_ENABLE))),$(FMN_SRCFILES))
 
 linux_SRCFILES_DATA:=$(filter src/data/%,$(linux_SRCFILES))
+$(foreach F,$(filter src/data/%.adjust,$(linux_SRCFILES_DATA)),$(eval $(patsubst src/%.adjust,$(linux_MIDDIR)/%.mid.c,$F):$F))
+linux_SRCFILES_DATA:=$(filter-out src/data/song/%.adjust,$(linux_SRCFILES_DATA))
 linux_MIDFILES_DATA:=$(patsubst src/%,$(linux_MIDDIR)/%.c,$(linux_SRCFILES_DATA))
 #TODO Image format. Eventually, linux should get images in every format, figure out how that's going to work.
 $(linux_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2
+$(linux_MIDDIR)/data/waves.txt.c:src/data/waves.txt $(tool_EXE_waves);$(PRECMD) $(tool_EXE_waves) -o$@ -i$< --name=fmnr_waves
+$(linux_MIDDIR)/data/%.mid.c:src/data/%.mid $(tool_EXE_songcvt);$(PRECMD) $(tool_EXE_songcvt) -o$@ -i$< --adjust=src/data/$*.adjust
 $(linux_MIDDIR)/data/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$<
 
 linux_CFILES:=$(filter %.c,$(linux_SRCFILES) $(linux_MIDFILES_DATA))

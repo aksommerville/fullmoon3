@@ -70,3 +70,11 @@ int fmn_encode_fmt(struct fmn_encoder *encoder,const char *fmt,...) {
     if (fmn_encoder_require(encoder,err+1)<0) return -1;
   }
 }
+
+/* Scalars.
+ */
+ 
+int fmn_encode_u8(struct fmn_encoder *encoder,uint8_t src) {
+  uint8_t tmp[]={src};
+  return fmn_encode_raw(encoder,tmp,sizeof(tmp));
+}

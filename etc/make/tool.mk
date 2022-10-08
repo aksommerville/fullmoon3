@@ -26,8 +26,10 @@ tool_NAMES:=$(filter-out common,$(notdir $(wildcard src/tool/*)))
 define tool_RULES
   tool_$1_SRCFILES:=$(tool_SRCFILES_COMMON) $(filter src/tool/$1/%.c,$(FMN_SRCFILES))
   tool_$1_OFILES:=$$(patsubst src/%,$(tool_MIDDIR)/%.o,$$(basename $$(tool_$1_SRCFILES)))
+  -include $$(tool_$1_OFILES:.o=.d)
   tool_EXE_$1:=$(tool_OUTDIR)/$1
   all:$$(tool_EXE_$1)
   $$(tool_EXE_$1):$$(tool_$1_OFILES);$$(PRECMD) $(tool_LD) -o $$@ $$^ $(tool_LDPOST)
 endef
 $(foreach T,$(tool_NAMES),$(eval $(call tool_RULES,$T)))
+
