@@ -14,6 +14,7 @@ struct fmn_map {
 // Decoding does not populate these. Caller should:
   const struct fmn_image *tilesheet;
   const struct fmn_map_resource *neighborw,*neighbore,*neighborn,*neighbors;
+  uint8_t has_hero_cell_features; // nonzero if hero should check the map on cell changes (eg doors present)
 };
 
 /* As stored in program image.
@@ -54,6 +55,7 @@ void fmn_map_decode(struct fmn_map *dst,const struct fmn_map_resource *res);
 #define FMN_MAP_CMD_HOME         0x27
 #define FMN_MAP_CMD_EVENT1       0x60
 #define FMN_MAP_CMD_CELLIF       0x61
+#define FMN_MAP_CMD_DOOR         0x62
 #define FMN_MAP_CMD_SPRITE       0x80
 #define FMN_MAP_CMD_EVENTV       0xe0
 
@@ -64,7 +66,9 @@ int8_t fmn_map_for_each_command(
 );
 
 /* Nonzero if we loaded the new map.
+ * (col,row)=(0,0) is technically valid, but unlikely in real life, so we treat that as "unspecified".
+ * Use (0,0) to select a hero position automatically based on (transition), map commands, or current position.
  */
-uint8_t fmn_game_navigate(const struct fmn_map_resource *map,uint8_t transition);
+uint8_t fmn_game_navigate(const struct fmn_map_resource *map,uint8_t col,uint8_t row,uint8_t transition);
 
 #endif

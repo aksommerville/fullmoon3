@@ -90,94 +90,6 @@ static void fmn_image_transition_pan_down(
   fmn_image_blit(to,0,0,from,0,to->h-d,to->w,d,0);
 }
 
-/* Dissolve.
- * XXX This works but it's not great, and I'm starting to question whether we really want an image-to-image dissolve.
- */
- 
-static void fmn_image_transition_dissolve(
-  struct fmn_image *to,
-  const struct fmn_image *from,
-  uint8_t p,uint8_t c
-) {
-  // 79 and 7 are two arbitrarily chosen prime numbers.
-  // 79 should be at least as large as the longest (c) we expect.
-  uint8_t mask[79]={0};
-  int step=7;
-  int maskp=0,i=(((int)c-(int)p)*sizeof(mask))/(int)c;
-  for (;i-->0;maskp+=step) mask[maskp%sizeof(mask)]=1;
-  maskp=0;
-  
-  int16_t imagew=to->w>>2; // try 4 pixels at a time, so we can operate bytewise.
-  int16_t x=0,y=0;
-  uint8_t d=0; // 0=(x--,y++) 1=(x++,y--)
-  int16_t secondx=0,secondy=0,secondc=0,stopp;
-  if (imagew<to->h) {
-    stopp=imagew;
-    secondy=imagew;
-    secondc=to->h/imagew;
-  } else {
-    stopp=to->h;
-    secondx=stopp>>2;
-    secondc=imagew/to->h;
-  }
-  int32_t walkc=stopp*stopp;
-  stopp--;
-  int dststride=to->stride;
-  int srcstride=from->stride;
-  uint8_t *dsta=to->v;
-  uint8_t *dstb=dsta+secondx+secondy*dststride;
-  const uint8_t *srca=from->v;
-  const uint8_t *srcb=srca+secondx+secondy*srcstride;
-  for (;walkc-->0;) {
-    if (d) {
-      if (!y) {
-        d=0;
-        x++;
-        dsta++; dstb++; srca++; srcb++;
-      } else if (x>=stopp) {
-        d=0;
-        y++;
-        dsta+=dststride; dstb+=dststride; srca+=srcstride; srcb+=srcstride;
-      } else {
-        x++;
-        y--;
-        dsta+=1-dststride; dstb+=1-dststride;
-        srca+=1-srcstride; srcb+=1-srcstride;
-      }
-    } else {
-      if (!x) {
-        d=1;
-        y++;
-        dsta+=dststride; dstb+=dststride; srca+=srcstride; srcb+=srcstride;
-      } else if (y>=stopp) {
-        d=1;
-        x++;
-        dsta++; dstb++; srca++; srcb++;
-      } else {
-        x--;
-        y++;
-        dsta+=dststride-1; dstb+=dststride-1;
-        srca+=srcstride-1; srcb+=srcstride-1;
-      }
-    }
-    maskp++;
-    if (maskp>=sizeof(mask)) maskp-=sizeof(mask);
-    if (mask[maskp]) {
-      *dsta=*srca;
-      int16_t i=secondc;
-      while (i-->0) { 
-        int16_t sx=x+secondx*(i+1);
-        if ((sx>=0)&&(sx<imagew)) {
-          int16_t sy=y+secondy*(i+1);
-          if ((sy>=0)&&(sy<to->h)) {
-            dstb[(dstb-dsta)*i]=srcb[(srcb-srca)*i];
-          }
-        }
-      }
-    }
-  }
-}
-
 /* Dissolve with intermediate blackout.
  */
  
@@ -259,7 +171,7 @@ static void fmn_image_dissolve_blackout(
   }
 }
  
-static void fmn_image_transition_dissolve2(
+static void fmn_image_transition_dissolve(
   struct fmn_image *to,
   const struct fmn_image *from,
   uint8_t p,uint8_t c
@@ -339,22 +251,23 @@ void fmn_image_transition(
   // With (p) on one of its edges, the image is either fully "to" or "from".
   // These rules also ensure that (c>0).
   if (transition->p>=transition->c) {
+    return;
+  }
+  if (!transition->p) {
     fmn_image_blit(to,0,0,from,0,0,from->w,from->h,0);
     return;
   }
-  if (!transition->p) return;
   
   // Since we operate on the "to" image, it makes more sense to reverse (p).
   // Now p==0 means do nothing.
-  uint8_t p=transition->c-transition->p-1;
+  uint8_t p=transition->c-transition->p;
   
   switch (transition->mode) {
     case FMN_TRANSITION_PAN_LEFT: fmn_image_transition_pan_left(to,from,p,transition->c); return;
     case FMN_TRANSITION_PAN_RIGHT: fmn_image_transition_pan_right(to,from,p,transition->c); return;
     case FMN_TRANSITION_PAN_UP: fmn_image_transition_pan_up(to,from,p,transition->c); return;
     case FMN_TRANSITION_PAN_DOWN: fmn_image_transition_pan_down(to,from,p,transition->c); return;
-    case FMN_TRANSITION_DISSOLVE: fmn_image_transition_dissolve(to,from,transition->p,transition->c); return;
-    case FMN_TRANSITION_DISSOLVE2: fmn_image_transition_dissolve2(to,from,p,transition->c); return;
+    case FMN_TRANSITION_DISSOLVE: fmn_image_transition_dissolve(to,from,p,transition->c); return;
     case FMN_TRANSITION_SPOTLIGHT: fmn_image_transition_spotlight(to,from,transition); return;
   }
   

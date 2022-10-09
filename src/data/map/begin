@@ -12,3 +12,4 @@ hero 3 1
 song seven_circles
 neighbore test_east
 neighbors test_south
+door 7 6 test_inside 6 7

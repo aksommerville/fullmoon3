@@ -25,6 +25,8 @@ home MAPID
 
 event EVID HOOKID [ARGS...]
 
-sprite X Y SPRITECTLID [ARGS...]
-
 cellif FLAGID X Y TILEID
+
+door X Y MAPID DSTX DSTY
+
+sprite X Y SPRITECTLID [ARGS...]

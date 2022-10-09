@@ -97,9 +97,8 @@ void fmn_image_blit_tile(
 #define FMN_TRANSITION_PAN_RIGHT    2
 #define FMN_TRANSITION_PAN_UP       3
 #define FMN_TRANSITION_PAN_DOWN     4
-#define FMN_TRANSITION_DISSOLVE     5 /* image-to-image, randomishly. Bytewise: At 2-bit, pixels appear in 4-pixel lumps. */
-#define FMN_TRANSITION_DISSOLVE2    6 /* Dissolve with intermediate blackout. */
-#define FMN_TRANSITION_SPOTLIGHT    7 /* Requires "out" and "in" locations. */
+#define FMN_TRANSITION_DISSOLVE     5 /* Dissolve with intermediate blackout. */
+#define FMN_TRANSITION_SPOTLIGHT    6 /* Requires "out" and "in" locations. */
 
 struct fmn_transition {
   uint8_t mode; // FMN_TRANSITION_*

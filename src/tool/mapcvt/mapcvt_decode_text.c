@@ -140,6 +140,73 @@ static int mapcvt_cmd_event(const struct mapcvt_token *tokenv,int tokenc,const c
   return 0;
 }
 
+/* "cellif" FLAGID X Y TILEID
+ */
+ 
+static int mapcvt_cmd_cellif(const struct mapcvt_token *tokenv,int tokenc,const char *path,int lineno) {
+  if ((tokenc!=4)||!tokenv[1].vok||!tokenv[2].vok||!tokenv[3].vok) {
+    fprintf(stderr,
+      "%s:%d: Expected 'FLAGID X Y TILEID' after 'cellif'\n",
+      path,lineno
+    );
+    return -2;
+  }
+  int flagid=mapcvt_flagid_eval(tokenv[0].src,tokenv[0].srcc);
+  if ((flagid<0)||(flagid>=0x100)) {
+    fprintf(stderr,
+      "%s:%d: Failed to evaluate '%.*s' as flag ID\n",
+      path,lineno,tokenv[0].srcc,tokenv[0].src
+    );
+    return -2;
+  }
+  if (
+    (tokenv[1].v<0)||(tokenv[1].v>=FMN_COLC)||
+    (tokenv[2].v<0)||(tokenv[2].v>=FMN_ROWC)||
+    (tokenv[3].v<0)||(tokenv[3].v>0xff)
+  ) {
+    fprintf(stderr,
+      "%s:%d: cellif params (%d,%d,%d) out of range 0..(%d,%d,%d)-1\n",
+      path,lineno,tokenv[1].v,tokenv[2].v,tokenv[3].v,FMN_COLC,FMN_ROWC,0x100
+    );
+    return -2;
+  }
+  uint8_t cmd[]={FMN_MAP_CMD_CELLIF,flagid,(tokenv[1].v<<4)|tokenv[2].v,tokenv[3].v,0};
+  if (fmn_encode_raw(&mapcvt.bin,cmd,sizeof(cmd))<0) return -1;
+  return 0;
+}
+
+/* "door" X Y MAPID DSTX DSTY
+ */
+ 
+static int mapcvt_cmd_door(const struct mapcvt_token *tokenv,int tokenc,const char *path,int lineno) {
+  if (
+    (tokenc!=5)||
+    !tokenv[0].vok||!tokenv[1].vok||
+    !tokenv[3].vok||!tokenv[4].vok||
+    (tokenv[0].v<0)||(tokenv[0].v>=FMN_COLC)||
+    (tokenv[1].v<0)||(tokenv[1].v>=FMN_ROWC)||
+    (tokenv[3].v<0)||(tokenv[3].v>=FMN_COLC)||
+    (tokenv[4].v<0)||(tokenv[4].v>=FMN_ROWC)
+  ) {
+    fprintf(stderr,
+      "%s:%d: Expected 'X Y MAPID DSTX DSTY' after 'door'\n",
+      path,lineno
+    );
+    return -2;
+  }
+  int refid=mapcvt_refv_intern("fmnr_map_",tokenv[2].src,tokenv[2].srcc);
+  if (refid<0) {
+    if (mapcvt.refc>=0xff) fprintf(stderr,"%s:%d: Too many external references, limit 255\n",path,lineno);
+    else fprintf(stderr,"%s:%d: Failed to add external refernce for map '%.*s'\n",path,lineno,tokenv[2].srcc,tokenv[2].src);
+    return -2;
+  }
+  uint8_t srcpos=(tokenv[0].v<<4)|tokenv[1].v;
+  uint8_t dstpos=(tokenv[3].v<<4)|tokenv[4].v;
+  uint8_t cmd[]={FMN_MAP_CMD_DOOR,srcpos,refid,dstpos,0};
+  if (fmn_encode_raw(&mapcvt.bin,cmd,sizeof(cmd))<0) return -1;
+  return 0;
+}
+
 /* "sprite" X Y SPRITECTLID [ARGS...]
  */
  
@@ -188,41 +255,6 @@ static int mapcvt_cmd_sprite(const struct mapcvt_token *tokenv,int tokenc,const 
   return 0;
 }
 
-/* "cellif" FLAGID X Y TILEID
- */
- 
-static int mapcvt_cmd_cellif(const struct mapcvt_token *tokenv,int tokenc,const char *path,int lineno) {
-  if ((tokenc!=4)||!tokenv[1].vok||!tokenv[2].vok||!tokenv[3].vok) {
-    fprintf(stderr,
-      "%s:%d: Expected 'FLAGID X Y TILEID' after 'cellif'\n",
-      path,lineno
-    );
-    return -2;
-  }
-  int flagid=mapcvt_flagid_eval(tokenv[0].src,tokenv[0].srcc);
-  if ((flagid<0)||(flagid>=0x100)) {
-    fprintf(stderr,
-      "%s:%d: Failed to evaluate '%.*s' as flag ID\n",
-      path,lineno,tokenv[0].srcc,tokenv[0].src
-    );
-    return -2;
-  }
-  if (
-    (tokenv[1].v<0)||(tokenv[1].v>=FMN_COLC)||
-    (tokenv[2].v<0)||(tokenv[2].v>=FMN_ROWC)||
-    (tokenv[3].v<0)||(tokenv[3].v>0xff)
-  ) {
-    fprintf(stderr,
-      "%s:%d: cellif params (%d,%d,%d) out of range 0..(%d,%d,%d)-1\n",
-      path,lineno,tokenv[1].v,tokenv[2].v,tokenv[3].v,FMN_COLC,FMN_ROWC,0x100
-    );
-    return -2;
-  }
-  uint8_t cmd[]={FMN_MAP_CMD_CELLIF,flagid,(tokenv[1].v<<4)|tokenv[2].v,tokenv[3].v,0};
-  if (fmn_encode_raw(&mapcvt.bin,cmd,sizeof(cmd))<0) return -1;
-  return 0;
-}
-
 /* Decode a command.
  */
  
@@ -260,8 +292,9 @@ static int mapcvt_decode_command(const char *src,int srcc,const char *path,int l
   if ((kwc==9)&&!memcmp(kw,"neighbors",9)) return mapcvt_cmd_neighbors(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==4)&&!memcmp(kw,"home",4)) return mapcvt_cmd_home(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==5)&&!memcmp(kw,"event",5)) return mapcvt_cmd_event(tokenv+1,tokenc-1,path,lineno);
-  if ((kwc==6)&&!memcmp(kw,"sprite",6)) return mapcvt_cmd_sprite(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==6)&&!memcmp(kw,"cellif",6)) return mapcvt_cmd_cellif(tokenv+1,tokenc-1,path,lineno);
+  if ((kwc==4)&&!memcmp(kw,"door",4)) return mapcvt_cmd_door(tokenv+1,tokenc-1,path,lineno);
+  if ((kwc==6)&&!memcmp(kw,"sprite",6)) return mapcvt_cmd_sprite(tokenv+1,tokenc-1,path,lineno);
   
   fprintf(stderr,"%s:%d: Unknown command '%.*s'\n",path,lineno,kwc,kw);
   return 0;
