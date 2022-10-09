@@ -53,6 +53,7 @@ int mapcvt_generate_output() {
   }
   
   OUT("#include <stdint.h>\n")
+  OUT("#include \"game/map/fmn_map.h\"\n")
   if (tool_cmdline_get_option_boolean(&mapcvt.cmdline,"progmem",7)) {
     OUT("#include <avr/pgmspace.h>\n")
   } else {
@@ -63,12 +64,12 @@ int mapcvt_generate_output() {
   int i;
   OUT("typedef struct {} unknown_external_t;\n")
   for (i=0;i<mapcvt.refc;i++) OUT("extern unknown_external_t %s;\n",mapcvt.refv[i]);
-  OUT("const void *%.*s_refv[] PROGMEM={\n",namec,name)
+  OUT("static const void *%.*s_refv[] PROGMEM={\n",namec,name)
   for (i=0;i<mapcvt.refc;i++) OUT("  &%s,\n",mapcvt.refv[i])
   OUT("};\n")
   
   // Raw data.
-  OUT("const uint8_t %.*s[] PROGMEM={\n",namec,name)
+  OUT("static const uint8_t %.*s_serial[] PROGMEM={\n",namec,name)
   int linelen=0;
   const uint8_t *v=mapcvt.bin.v;
   for (i=mapcvt.bin.c;i-->0;v++) {
@@ -81,6 +82,12 @@ int mapcvt_generate_output() {
     }
   }
   if (linelen) OUT("\n")
+  OUT("};\n")
+  
+  // Wrapped up in a struct, for a single point of contact.
+  OUT("const struct fmn_map_resource %.*s={\n",namec,name)
+  OUT("  .serial=%.*s_serial,\n",namec,name)
+  OUT("  .refv=%.*s_refv,\n",namec,name)
   OUT("};\n")
 
   #undef OUT

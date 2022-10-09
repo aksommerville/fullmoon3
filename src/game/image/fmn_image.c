@@ -88,3 +88,12 @@ uint32_t fmn_pixel_from_rgba(uint8_t fmt,uint8_t r,uint8_t g,uint8_t b,uint8_t a
   }
   return 0;
 }
+
+uint8_t fmn_pixel_size_for_image_format(uint8_t fmt) {
+  switch (fmt) {
+    case FMN_IMAGE_FMT_RGBA: return 32;
+    case FMN_IMAGE_FMT_Y8: return 8;
+    case FMN_IMAGE_FMT_Y2: return 2;
+  }
+  return 0;
+}

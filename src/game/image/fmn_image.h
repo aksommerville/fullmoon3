@@ -60,6 +60,7 @@ int8_t fmn_image_ref(struct fmn_image *image);
 
 struct fmn_image *fmn_image_new_alloc(uint8_t fmt,int16_t w,int16_t h);
 
+uint8_t fmn_pixel_size_for_image_format(uint8_t fmt);
 int16_t fmn_image_measure(uint8_t fmt,int16_t w,int16_t h);
 int16_t fmn_image_minimum_stride(uint8_t fmt,int16_t w,int16_t h);
 
@@ -84,6 +85,33 @@ void fmn_image_blit_tile(
   const struct fmn_image *src,
   uint8_t tileid,
   uint8_t xform
+);
+
+/* Transitions.
+ * Caller supplies an overwriteable framebuffer containing the "to" image,
+ * and another of equal size with the "from".
+ ************************************************************************/
+ 
+#define FMN_TRANSITION_NONE         0
+#define FMN_TRANSITION_PAN_LEFT     1 /* pan: Direction is the camera's motion. So "LEFT" means the images slide rightward. */
+#define FMN_TRANSITION_PAN_RIGHT    2
+#define FMN_TRANSITION_PAN_UP       3
+#define FMN_TRANSITION_PAN_DOWN     4
+#define FMN_TRANSITION_DISSOLVE     5 /* image-to-image, randomishly. Bytewise: At 2-bit, pixels appear in 4-pixel lumps. */
+#define FMN_TRANSITION_DISSOLVE2    6 /* Dissolve with intermediate blackout. */
+#define FMN_TRANSITION_SPOTLIGHT    7 /* Requires "out" and "in" locations. */
+
+struct fmn_transition {
+  uint8_t mode; // FMN_TRANSITION_*
+  uint8_t p; // 0..c
+  uint8_t c;
+  int16_t outx,outy,inx,iny; // SPOTLIGHT only. NB: Pixels, not mm.
+};
+
+void fmn_image_transition(
+  struct fmn_image *to,
+  const struct fmn_image *from,
+  struct fmn_transition *transition
 );
 
 #endif

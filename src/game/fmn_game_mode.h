@@ -25,5 +25,6 @@ void fmn_game_mode_title_render(struct fmn_image *fb);
 void fmn_game_mode_play_input(uint8_t input,uint8_t pvinput);
 void fmn_game_mode_play_update();
 void fmn_game_mode_play_render(struct fmn_image *fb);
+void fmn_game_mode_play_render_pretransition(struct fmn_image *fb);
 
 #endif

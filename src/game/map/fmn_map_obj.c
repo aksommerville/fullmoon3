@@ -4,10 +4,18 @@
 /* Decode map.
  */
  
-void fmn_map_decode(struct fmn_map *dst,const void *src,const void **refv) {
-  memcpy(dst->v,src,FMN_COLC*FMN_ROWC);
-  dst->cmdv=(uint8_t*)src+FMN_COLC*FMN_ROWC;
-  dst->refv=refv;
+static const uint8_t fmn_map_cmdv_default[]={FMN_MAP_CMD_EOF};
+static const void *fmn_map_refv_default[]={};
+ 
+void fmn_map_decode(struct fmn_map *dst,const struct fmn_map_resource *res) {
+  memset(dst,0,sizeof(struct fmn_map));
+  if (res) {
+    memcpy(dst->v,res->serial,FMN_COLC*FMN_ROWC);
+    dst->cmdv=(uint8_t*)res->serial+FMN_COLC*FMN_ROWC;
+    dst->refv=res->refv;
+  }
+  if (!dst->cmdv) dst->cmdv=fmn_map_cmdv_default;
+  if (!dst->refv) dst->refv=fmn_map_refv_default;
 }
 
 /* Iterate commands.
