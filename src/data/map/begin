@@ -13,3 +13,4 @@ song seven_circles
 neighbore test_east
 neighbors test_south
 door 7 6 test_inside 6 7
+sprite 5 4 bug

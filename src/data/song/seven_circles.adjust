@@ -1,4 +1,6 @@
+mode 1 voice 1
 env 1 20 0x2000 30 0x1000 50
+mode 2 voice 0
 env 2 20 0x2000 30 0x1000 50
 
 map track=1 chan=0 => chan=1

@@ -3,6 +3,7 @@
 #include "game/image/fmn_image.h"
 #include "game/map/fmn_map.h"
 #include "game/hero/fmn_hero.h"
+#include "game/sprite/fmn_sprite.h"
 #include "game/fmn_data.h"
 #include "fmn_play.h"
 #include <stdio.h>
@@ -49,7 +50,7 @@ static int8_t fmn_game_cb_mapcmd_load(uint8_t cmd,const uint8_t *argv,uint8_t ar
     case FMN_MAP_CMD_EVENT1: break;//TODO
     case FMN_MAP_CMD_CELLIF: break;//TODO
     case FMN_MAP_CMD_DOOR: fmn_map.has_hero_cell_features=1; break;
-    case FMN_MAP_CMD_SPRITE: break;//TODO
+    case FMN_MAP_CMD_SPRITE: fmn_game_spawn_sprite(fmn_map.refv[argv[1]],argv[0]>>4,argv[0]&15,argv+2,argc-2); break;
     case FMN_MAP_CMD_EVENTV: break;//TODO
   }
   return 0;
@@ -60,7 +61,8 @@ static int8_t fmn_game_cb_mapcmd_load(uint8_t cmd,const uint8_t *argv,uint8_t ar
  
 void fmn_game_reset() {
   fmn_hero_reset();
-
+  fmn_spritev_clear();
+  
   fmn_map_decode(&fmn_map,&fmnr_map_begin);
   struct fmn_game_cb_mapcmd_load_context ctx={0};
   fmn_map_for_each_command(fmn_map.cmdv,fmn_game_cb_mapcmd_load,&ctx);
@@ -69,6 +71,8 @@ void fmn_game_reset() {
     int16_t heroy=ctx.heroy*FMN_MM_PER_TILE+(FMN_MM_PER_TILE>>1);
     fmn_hero_set_position(herox,heroy);
   }
+  
+  struct fmn_sprite *hero=fmn_game_spawn_sprite(&fmn_sprite_type_hero,0,0,0,0);
 }
 
 /* Navigate to map.
@@ -97,7 +101,7 @@ uint8_t fmn_game_navigate(const struct fmn_map_resource *map,uint8_t col,uint8_t
   }
   
   //TODO exit hooks
-  //TODO drop sprites etc
+  fmn_spritev_clear();
   
   fmn_map_decode(&fmn_map,map);
   fmn_map_for_each_command(fmn_map.cmdv,fmn_game_cb_mapcmd_load,&ctx);
@@ -123,6 +127,11 @@ uint8_t fmn_game_navigate(const struct fmn_map_resource *map,uint8_t col,uint8_t
     fmn_play_transition.iny=((int32_t)heroy*FMN_TILESIZE)/FMN_MM_PER_TILE;
   }
   fmn_hero_set_position(herox,heroy);
+  struct fmn_sprite *hero=fmn_game_spawn_sprite(&fmn_sprite_type_hero,0,0,0,0);
+  if (hero) {
+    hero->x=herox;
+    hero->y=heroy;
+  }
   
   return 1;
 }
@@ -131,41 +140,30 @@ uint8_t fmn_game_navigate(const struct fmn_map_resource *map,uint8_t col,uint8_t
  */
  
 void fmn_game_mode_play_input(uint8_t input,uint8_t pvinput) {
-
-  /*XXX TEMP: Navigate on dpad strokes.
-  if ((input&FMN_BUTTON_LEFT)&&!(pvinput&FMN_BUTTON_LEFT)) fmn_game_navigate(fmn_map.neighborw,FMN_TRANSITION_PAN_LEFT);
-  if ((input&FMN_BUTTON_RIGHT)&&!(pvinput&FMN_BUTTON_RIGHT)) fmn_game_navigate(fmn_map.neighbore,FMN_TRANSITION_PAN_RIGHT);
-  if ((input&FMN_BUTTON_UP)&&!(pvinput&FMN_BUTTON_UP)) fmn_game_navigate(fmn_map.neighborn,FMN_TRANSITION_PAN_UP);
-  if ((input&FMN_BUTTON_DOWN)&&!(pvinput&FMN_BUTTON_DOWN)) fmn_game_navigate(fmn_map.neighbors,FMN_TRANSITION_PAN_DOWN);
-  /**/
-  
   fmn_hero_input(input,pvinput);
-  
 }
 
 /* Update.
  */
- static uint8_t slowdown=0;
+
 void fmn_game_mode_play_update() {
 
   // Transition timing is based on update, not render. It's a gameplay thing.
   // (though those two timings should always be the same thing).
   if (fmn_play_transition.c) {
-    if (0&&slowdown) slowdown--; else { slowdown=10;
     fmn_play_transition.p++;
     if (fmn_play_transition.p>=fmn_play_transition.c) {
       fmn_play_transition.c=0;
     } else {
       // All normal updating is suspended while transition in progress.
       //TODO Maybe permit sprites to animate but not move or interact?
-      //TODO Maybe watch inputs for cancellation of the transition? Not sure we can do much about that.
       return;
-    }
     }
   }
   
   fmn_hero_update();
-  //TODO Update sprites
+  fmn_spritev_update();
+  fmn_spritev_sort_partial();
   //TODO Weather? Other recurring update tasks?
 }
 
@@ -194,16 +192,23 @@ static void fmn_game_render_bg(struct fmn_image *fb) {
 /* Render sprites.
  */
  
-uint8_t herocolor=0;//XXX
- 
 static void fmn_game_render_sprites(struct fmn_image *fb) {
-  //TODO sprites
-  herocolor++;
-  int16_t herox,heroy;
-  fmn_hero_get_position(&herox,&heroy);
-  herox=((int32_t)herox*FMN_TILESIZE)/FMN_MM_PER_TILE;
-  heroy=((int32_t)heroy*FMN_TILESIZE)/FMN_MM_PER_TILE;
-  fmn_image_fill_rect(fb,herox-1,heroy-1,2,2,herocolor&3);
+  struct fmn_sprite *sprite=fmn_spritev;
+  uint8_t i=fmn_spritec;
+  for (;i-->0;sprite++) {
+    if (!sprite->type) continue;
+    int16_t dstx=((int32_t)sprite->x*FMN_TILESIZE)/FMN_MM_PER_TILE;
+    int16_t dsty=((int32_t)sprite->y*FMN_TILESIZE)/FMN_MM_PER_TILE;
+    if (sprite->type->render) {
+      sprite->type->render(fb,sprite,dstx,dsty);
+    } else if (sprite->tilesheet) {
+      dstx-=FMN_TILESIZE>>1;
+      dsty-=FMN_TILESIZE>>1;
+      int16_t srcx=(sprite->tileid&15)*FMN_TILESIZE;
+      int16_t srcy=(sprite->tileid>>4)*FMN_TILESIZE;
+      fmn_image_blit(fb,dstx,dsty,sprite->tilesheet,srcx,srcy,FMN_TILESIZE,FMN_TILESIZE,sprite->xform);
+    }
+  }
 }
 
 /* Diegetic overlay.
@@ -245,4 +250,22 @@ void fmn_game_mode_play_render(struct fmn_image *fb) {
 void fmn_game_mode_play_render_pretransition(struct fmn_image *fb) {
   fmn_game_render_bg(fb);
   fmn_game_render_sprites(fb);
+}
+
+/* Spawn sprite.
+ */
+ 
+struct fmn_sprite *fmn_game_spawn_sprite(
+  const struct fmn_sprite_type *type,
+  uint8_t col,uint8_t row,
+  const uint8_t *argv,uint8_t argc
+) {
+  if (!type) return 0;
+  struct fmn_sprite *sprite=fmn_sprite_alloc();
+  if (!sprite) return 0;
+  sprite->type=type;
+  sprite->x=col*FMN_MM_PER_TILE+(FMN_MM_PER_TILE>>1);
+  sprite->y=row*FMN_MM_PER_TILE+(FMN_MM_PER_TILE>>1);
+  if (type->init) type->init(sprite,argv,argc);
+  return sprite;
 }

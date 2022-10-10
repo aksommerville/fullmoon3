@@ -6,6 +6,11 @@
 void fmn_hero_event_dpad(int8_t x,int8_t y) {
   fmn_hero.indx=x;
   fmn_hero.indy=y;
+  
+       if (x<0) fmn_hero.facedir=FMN_DIR_W;
+  else if (x>0) fmn_hero.facedir=FMN_DIR_E;
+  else if (y<0) fmn_hero.facedir=FMN_DIR_N;
+  else if (y>0) fmn_hero.facedir=FMN_DIR_S;
 }
 
 /* Buttons changed.

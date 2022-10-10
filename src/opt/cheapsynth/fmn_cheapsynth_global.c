@@ -83,6 +83,7 @@ void fmn_cheapsynth_update(int16_t *v,int16_t c) {
 void fmn_cheapsynth_play_song(const void *v,uint16_t c) {
   if (v==fmn_cheapsynth.song) return;
   const uint8_t *V=v;
+  fmn_cheapsynth_release_all();
   
   if (!v||(c<4)) {
    _no_song_:;

@@ -234,10 +234,10 @@ static int mapcvt_cmd_sprite(const struct mapcvt_token *tokenv,int tokenc,const 
       return -2;
     }
   }
-  if (tokenc>8) {
+  if (tokenc>7) {
     fprintf(stderr,
-      "%s:%d:WARNING: Limit 5 sprite args. Ignoring %d\n",
-      path,lineno,tokenc-8
+      "%s:%d:WARNING: Limit 4 sprite args. Ignoring %d\n",
+      path,lineno,tokenc-7
     );
     tokenc=8;
   }

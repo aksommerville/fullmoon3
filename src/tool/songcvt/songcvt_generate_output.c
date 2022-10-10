@@ -28,6 +28,7 @@ static int songcvt_get_c_name(char *dst,int dsta) {
     } else if (
       ((*path>='a')&&(*path<='z'))||
       ((*path>='A')&&(*path<='Z'))||
+      ((*path>='0')&&(*path<='9'))||
       (*path=='_')
     ) {
       srcc++;
