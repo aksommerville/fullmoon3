@@ -15,9 +15,17 @@ extern struct imgcvt {
   struct tool_cmdline cmdline;
   struct fmn_image image;
   struct fmn_encoder final;
+  
+  // tileprops input
+  uint8_t tilepropv[256]; // 0,1,2,3; first table only
+  
+  // binary tileprops, physics only. 64 bytes or empty.
+  struct fmn_encoder tilepropsbin;
+  
 } imgcvt;
 
 int imgcvt_reformat_image(); // overwrites (image)
+int imgcvt_read_tileprops(const char *path); // populates (tilepropv,tilepropsbin)
 int imgcvt_generate_output(); // populates (final)
 
 #endif

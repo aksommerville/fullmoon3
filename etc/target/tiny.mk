@@ -97,12 +97,14 @@ tiny_SRCFILES:=$(filter-out \
   
 tiny_DATA_SRC:=$(filter src/data/%,$(tiny_SRCFILES))
 $(foreach F,$(filter src/data/%.adjust,$(tiny_DATA_SRC)),$(eval $(patsubst src/%.adjust,$(tiny_MIDDIR)/%.mid.c,$F):$F))
+$(foreach F,$(filter src/data/%.tileprops,$(tiny_DATA_SRC)),$(eval $(patsubst src/%.tileprops,$(tiny_MIDDIR)/%.png.c,$F):$F))
 tiny_DATA_SRC:=$(filter-out src/data/song/%.adjust,$(tiny_DATA_SRC))
+tiny_DATA_SRC:=$(filter-out src/data/image/%.tileprops,$(tiny_DATA_SRC))
 tiny_DATA_SRC:=$(filter-out src/data/meta/%,$(tiny_DATA_SRC))
 tiny_DATA_MID:=$(patsubst src/%,$(tiny_MIDDIR)/%.c,$(tiny_DATA_SRC))
 tiny_MENU_SPLASH:=$(tiny_OUTDIR)/fullmoon.tsv
 
-$(tiny_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2 --progmem=1
+$(tiny_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2 --progmem=1 --tileprops=src/data/$*.tileprops
 $(tiny_MIDDIR)/data/waves.txt.c:src/data/waves.txt $(tool_EXE_waves);$(PRECMD) $(tool_EXE_waves) -o$@ -i$< --progmem=1 --name=fmnr_waves
 $(tiny_MIDDIR)/data/%.mid.c:src/data/%.mid $(tool_EXE_songcvt);$(PRECMD) $(tool_EXE_songcvt) -o$@ -i$< --progmem=1 --adjust=src/data/$*.adjust
 $(tiny_MIDDIR)/data/map/%.c:src/data/map/% $(tool_EXE_mapcvt);$(PRECMD) $(tool_EXE_mapcvt) -o$@ -i$< --progmem=1

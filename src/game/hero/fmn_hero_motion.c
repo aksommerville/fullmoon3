@@ -65,18 +65,83 @@ static uint8_t fmn_hero_check_cells() {
   return 0;
 }
 
+/* Cross-axis correction.
+ * Call when the player requests motion on just one axis and is completely stymied.
+ * If the other axis is not aligned to a half-tile, we nudge toward the nearest half-tile interval.
+ * This is more important than it sounds. Without this, it's nearly impossible to enter a witch-wide gap.
+ * And it also bears on speed-running: Since the nudge speed is so low, it's advantageous to hit gaps precisely.
+ */
+ 
+#define FMN_HERO_NUDGE_INTERVAL (FMN_MM_PER_TILE)
+#define FMN_HERO_NUDGE_SPEED 10
+ 
+static void fmn_hero_nudge(int16_t *v) {
+  int16_t mod=((*v)-(FMN_MM_PER_TILE>>1))%FMN_HERO_NUDGE_INTERVAL;
+  if (!mod) return;
+  if (mod>=FMN_HERO_NUDGE_INTERVAL>>1) {
+    if (mod>FMN_HERO_NUDGE_INTERVAL-FMN_HERO_NUDGE_SPEED) (*v)+=FMN_HERO_NUDGE_INTERVAL-mod;
+    else (*v)+=FMN_HERO_NUDGE_SPEED;
+  } else {
+    if (mod<FMN_HERO_NUDGE_SPEED) (*v)-=mod;
+    else (*v)-=FMN_HERO_NUDGE_SPEED;
+  }
+}
+
+/* Target speed and acceleration.
+ * TODO These should all be different when flying.
+ * TODO Slippery floors, that kind of thing?
+ * Note that deceleration is positive.
+ */
+ 
+static int16_t fmn_hero_get_target_speed() {
+  return FMN_MM_PER_TILE/10;
+}
+
+static int16_t fmn_hero_get_acceleration() {
+  return 30;
+}
+
+static int16_t fmn_hero_get_deceleration() {
+  return 20;
+}
+
 /* Walk, update.
  */
 
 void fmn_hero_update_walk() {
-  //TODO accelerate/decelerate
-  //TODO broom
-  //TODO collisions
+
+  // Accelerate or decelerate.
   if (fmn_hero.indx||fmn_hero.indy) {
-    const int16_t speed=FMN_MM_PER_TILE/10; // (n) frames per tile
-    fmn_hero.x+=speed*fmn_hero.indx;
-    fmn_hero.y+=speed*fmn_hero.indy;
+    fmn_hero.walkdx=fmn_hero.indx;
+    fmn_hero.walkdy=fmn_hero.indy;
+    int16_t target=fmn_hero_get_target_speed();
+    if (fmn_hero.walkspeed<target) {
+      int16_t accel=fmn_hero_get_acceleration();
+      fmn_hero.walkspeed+=accel;
+      if (fmn_hero.walkspeed>target) fmn_hero.walkspeed=target;
+    } else if (fmn_hero.walkspeed>target) {
+      int16_t decel=fmn_hero_get_deceleration();
+      fmn_hero.walkspeed-=decel;
+      if (fmn_hero.walkspeed<target) fmn_hero.walkspeed=target;
+    }
+  } else if (fmn_hero.walkspeed) {
+    int16_t decel=fmn_hero_get_deceleration();
+    fmn_hero.walkspeed-=decel;
+    if (fmn_hero.walkspeed<=0) {
+      fmn_hero.walkspeed=0;
+      return;
+    }
+  } else return;
+
+  if (!fmn_hero_move_with_physics(
+    fmn_hero.walkspeed*fmn_hero.walkdx,
+    fmn_hero.walkspeed*fmn_hero.walkdy
+  )) {
+    if (!fmn_hero.indx&&fmn_hero.indy) fmn_hero_nudge(&fmn_hero.x);
+    else if (fmn_hero.indx&&!fmn_hero.indy) fmn_hero_nudge(&fmn_hero.y);
+    return;
   }
+  
   if (fmn_hero_check_edge_navigation()) return;
   if (fmn_hero_check_cells()) return;
 }

@@ -1,0 +1,16 @@
+Full Moon Tileprops Format
+
+A "*.tileprops" file corresponds to one image file, for 16x16-tile tilesheets.
+It consists of multiple tables of 16x16 integers. (ie 16 lines each with 16 space-delimited integers).
+Strict formatting, no comments, etc.
+
+The first table goes into the real game.
+These are the tile physics:
+  0 vacant
+  1 solid
+  2 hole
+  3 reserved
+  
+Subsequent tables are for the editor only:
+  - neighbor mask
+  - family

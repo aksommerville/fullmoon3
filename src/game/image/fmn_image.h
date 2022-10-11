@@ -53,6 +53,7 @@ struct fmn_image {
   uint8_t fmt;
   uint8_t flags;
   uint8_t refc; // 0=immortal
+  const uint8_t *tileprops; // If set, 64 bytes of 2-bit big-endian "property" values corresponding to the 256 tiles.
 };
 
 void fmn_image_del(struct fmn_image *image);

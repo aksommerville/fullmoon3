@@ -76,6 +76,21 @@ static int imgcvt_encode_c() {
   if (linelen) OUT("\n")
   OUT("};\n")
   
+  if (imgcvt.tilepropsbin.c) {
+    OUT("static const uint8_t %.*s_tileprops[] PROGMEM={\n",namec,name)
+    for (linelen=0,v=imgcvt.tilepropsbin.v,i=imgcvt.tilepropsbin.c;i-->0;v++) {
+      int err=fmn_encode_fmt(&imgcvt.final,"%d,",*v);
+      if (err<0) return -1;
+      linelen+=err;
+      if (linelen>=100) {
+        OUT("\n")
+        linelen=0;
+      }
+    }
+    if (linelen) OUT("\n")
+    OUT("};\n")
+  }
+  
   OUT("const struct fmn_image %.*s={\n",namec,name)
   OUT("  .v=(void*)%.*s_storage,\n",namec,name)
   OUT("  .w=%d,\n",imgcvt.image.w)
@@ -84,6 +99,9 @@ static int imgcvt_encode_c() {
   OUT("  .fmt=%d,\n",imgcvt.image.fmt)
   OUT("  .flags=%d,\n",imgcvt.image.flags&(FMN_IMAGE_FLAG_TRANSPARENT))
   OUT("  .refc=0,\n")
+  if (imgcvt.tilepropsbin.c) {
+    OUT("  .tileprops=%.*s_tileprops,\n",namec,name)
+  }
   OUT("};\n")
 
   #undef OUT

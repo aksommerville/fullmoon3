@@ -17,6 +17,7 @@ static void imgcvt_print_help(const char *exename) {
     "  --encoding=c|bin           [c] Output file format. 'bin' is headerless pixels.\n"
     "  --progmem=0|1              [0] Use Arduino PROGMEM declaration.\n"
     "  --name=STRING              Name of C object. Inferred from path if empty.\n"
+    "  --tileprops=PATH           Optional tileprops file, no error if absent.\n"
   );
 }
 
@@ -51,6 +52,14 @@ int main(int argc,char **argv) {
   if ((err=imgcvt_reformat_image())<0) {
     if (err!=-2) fprintf(stderr,"%s: Failed to reformat image.\n",imgcvt.cmdline.srcpathv[0]);
     return 1;
+  }
+  
+  const char *tilepropspath=0;
+  if ((err=tool_cmdline_get_option(&tilepropspath,&imgcvt.cmdline,"tileprops",9))>0) {
+    if ((err=imgcvt_read_tileprops(tilepropspath))<0) {
+      if (err!=-2) fprintf(stderr,"%s: Unspecified error reading tileprops\n",tilepropspath);
+      return 1;
+    }
   }
   
   if ((err=imgcvt_generate_output())<0) {
