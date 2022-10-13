@@ -144,7 +144,7 @@ static int png_decode_IDAT(struct png_decoder *png,const void *src,int srcc) {
     if (err<0) {
       err=inflate(&png->z,Z_SYNC_FLUSH);
       if (err<0) {
-        if (png->refname) fprintf(stderr,"%s: zlib error %d\n",png->refname);
+        if (png->refname) fprintf(stderr,"%s: zlib error %d\n",png->refname,err);
         return -2;
       }
     }
@@ -317,7 +317,7 @@ static int png_decode_finish(struct fmn_image *image,struct png_decoder *png) {
     }
     int err=inflate(&png->z,Z_FINISH);
     if (err<0) {
-      if (png->refname) fprintf(stderr,"%s: zlib error %d\n",png->refname);
+      if (png->refname) fprintf(stderr,"%s: zlib error %d\n",png->refname,err);
       return 0;
     }
     if (err==Z_STREAM_END) {

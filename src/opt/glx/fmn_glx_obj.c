@@ -115,7 +115,7 @@ static GLXFBConfig fmn_glx_get_fbconfig(struct fmn_hw_video *video) {
     GLX_ALPHA_SIZE,0,
     GLX_DEPTH_SIZE,0,
     GLX_STENCIL_SIZE,0,
-    GLX_DOUBLEBUFFER,0,
+    GLX_DOUBLEBUFFER,1,
   0};
   
   if (!glXQueryVersion(VIDEO->dpy,&VIDEO->glx_version_major,&VIDEO->glx_version_minor)) {
@@ -335,6 +335,7 @@ static struct fmn_image *_glx_begin(struct fmn_hw_video *video) {
 
 static void _glx_end(struct fmn_hw_video *video,struct fmn_image *fb) {
   if (fb!=VIDEO->fb) return;
+  glXMakeCurrent(VIDEO->dpy,VIDEO->win,VIDEO->ctx);
   
   if (VIDEO->dstdirty) {
     VIDEO->dstdirty=0;
@@ -374,6 +375,7 @@ static void _glx_end(struct fmn_hw_video *video,struct fmn_image *fb) {
   glLoadIdentity();
   glEnable(GL_TEXTURE_2D);
   glBegin(GL_TRIANGLE_STRIP);
+    glColor4ub(0xff,0xff,0xff,0xff);
     glTexCoord2i(0,0); glVertex2i(-1, 1);
     glTexCoord2i(0,1); glVertex2i(-1,-1);
     glTexCoord2i(1,0); glVertex2i( 1, 1);

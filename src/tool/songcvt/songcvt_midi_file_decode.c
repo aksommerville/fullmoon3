@@ -179,7 +179,7 @@ static int songcvt_midi_track_require_delay(struct songcvt_midi_file *file,struc
     if ((err=fmn_vlq_decode(&track->delay,track->v+track->p,track->c-track->p))<0) {
       fprintf(stderr,
         "%s:%d/%d:WARNING: Error decoding VLQ. Ignoring remainder of track.\n",
-        file->path,(track->v-file->src)+track->p,file->srcc
+        file->path,(int)(track->v-file->src)+track->p,file->srcc
       );
       track->term=1;
       return 0;

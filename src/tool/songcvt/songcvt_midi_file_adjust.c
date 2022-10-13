@@ -179,7 +179,7 @@ static int songcvt_adjust_cmd_end(
 ) {
   int pad;
   if ((fmn_int_eval(&pad,src,srcc)<2)||(pad<0)) {
-    fprintf(stderr,"%s:%d: Failed to evaluate '%.*s' as end padding. Hint: It's usually 4.\n",path,lineno);
+    fprintf(stderr,"%s:%d: Failed to evaluate '%.*s' as end padding. Hint: It's usually 4.\n",path,lineno,srcc,src);
     return -2;
   }
   if (pad>32) { // arbitrary limit, but need something to make overflow impossible
