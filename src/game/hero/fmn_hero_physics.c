@@ -6,6 +6,7 @@
  
 struct fmn_hero_escapement {
   int16_t w,e,n,s;
+  struct fmn_sprite *pumpkin;
 };
 
 /* Collide against screen edges, if no neighbor map present in that direction.
@@ -101,24 +102,22 @@ static uint8_t fmn_hero_collide_sprites(
   int16_t l,int16_t t,int16_t r,int16_t b
 ) {
   uint8_t result=0;
-  const struct fmn_sprite *sprite=fmn_spritev;
+  struct fmn_sprite *sprite=fmn_spritev;
   uint8_t i=fmn_spritec;
   for (;i-->0;sprite++) {
     if (!sprite->type) continue;
     if (sprite->type==&fmn_sprite_type_hero) continue;
-    //TODO "solid" flag for sprites
+    if (!(sprite->flags&FMN_SPRITE_FLAG_SOLID)) continue;
     
-    //TODO proper hitbox for sprite
-    int16_t sl=sprite->x-(FMN_MM_PER_TILE>>1);
+    int16_t sl,st,sw,sh;
+    fmn_sprite_hitbox(&sl,&st,&sw,&sh,sprite);
     if (sl>=r) continue;
-    int16_t st=sprite->y-(FMN_MM_PER_TILE>>1);
     if (st>=b) continue;
-    int16_t sr=sl+FMN_MM_PER_TILE;
-    if (sr<=l) continue;
-    int16_t sb=st+FMN_MM_PER_TILE;
-    if (sb<=t) continue;
+    int16_t sr=sl+sw; if (sr<=l) continue;
+    int16_t sb=st+sh; if (sb<=t) continue;
     
     if (!esc) return 1;
+    esc->pumpkin=sprite;
     int16_t q;
     if ((q=r-sl)>esc->w) esc->w=q;
     if ((q=b-st)>esc->n) esc->n=q;
@@ -161,7 +160,10 @@ static uint8_t fmn_hero_detect_collisions(
 /* Move with physics, main entry point.
  */
 
-int16_t fmn_hero_move_with_physics(int16_t dx,int16_t dy) {
+int16_t fmn_hero_move_with_physics(
+  struct fmn_sprite **pumpkin,
+  int16_t dx,int16_t dy
+) {
 
   // Where are we, before and after the move?
   //TODO proper hit box
@@ -180,6 +182,7 @@ int16_t fmn_hero_move_with_physics(int16_t dx,int16_t dy) {
     fmn_hero.y+=dy;
     return ((dx<0)?-dx:dx)+((dy<0)?-dy:dy);
   }
+  if (pumpkin) *pumpkin=esc.pumpkin;
   
   // Neuter any escape with a negative value, or greater than the original move.
   int16_t limit=((dx<0)?-dx:dx)+((dy<0)?-dy:dy);

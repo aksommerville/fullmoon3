@@ -41,6 +41,6 @@ void fmn_hero_update_animation();
  * X and Y axes are treated independently.
  * Motion should not be far enough to cross two cell boundaries, we assume there's no more than one.
  */
-int16_t fmn_hero_move_with_physics(int16_t dx,int16_t dy);
+int16_t fmn_hero_move_with_physics(struct fmn_sprite **pumpkin,int16_t dx,int16_t dy);
 
 #endif

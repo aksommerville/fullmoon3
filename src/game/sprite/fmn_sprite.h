@@ -5,25 +5,11 @@
 #define FMN_SPRITE_H
 
 #include <stdint.h>
+#include "api/fmn_common.h"
 
 struct fmn_sprite;
 struct fmn_sprite_type;
-
-/* Generic sprite instance.
- ********************************************************************/
- 
-#define FMN_SPRITE_BV_SIZE 8
-#define FMN_SPRITE_SV_SIZE 4
- 
-struct fmn_sprite {
-  const struct fmn_sprite_type *type; // null means sprite unused
-  const struct fmn_image *tilesheet;
-  int16_t x,y; // mm
-  int8_t layer;
-  uint8_t tileid,xform;
-  uint8_t bv[FMN_SPRITE_BV_SIZE];
-  int16_t sv[FMN_SPRITE_SV_SIZE];
-};
+struct fmn_image;
 
 /* Sprite type.
  *****************************************************************/
@@ -37,7 +23,44 @@ struct fmn_sprite_type {
    * If not implemented, there is a generic fallback.
    */
   void (*render)(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t x,int16_t y);
+  
+  /* Populate hitbox in mm.
+   * If unset, the default is a FMN_MM_PER_TILE square centered on (sprite->x,y).
+   */
+  void (*hitbox)(int16_t *x,int16_t *y,int16_t *w,int16_t *h,struct fmn_sprite *sprite);
+  
+  // Hero walks directly into sprite (implies that sprite is SOLID).
+  void (*push)(struct fmn_sprite *sprite,int8_t dx,int8_t dy);
 };
+
+/* Generic sprite instance.
+ ********************************************************************/
+ 
+#define FMN_SPRITE_BV_SIZE 8
+#define FMN_SPRITE_SV_SIZE 4
+
+#define FMN_SPRITE_FLAG_SOLID 0x01
+ 
+struct fmn_sprite {
+  const struct fmn_sprite_type *type; // null means sprite unused
+  const struct fmn_image *tilesheet;
+  int16_t x,y; // mm
+  int8_t layer;
+  uint8_t tileid,xform;
+  uint8_t flags;
+  uint8_t bv[FMN_SPRITE_BV_SIZE];
+  int16_t sv[FMN_SPRITE_SV_SIZE];
+};
+
+static inline void fmn_sprite_hitbox(int16_t *x,int16_t *y,int16_t *w,int16_t *h,struct fmn_sprite *sprite) {
+  if (sprite->type&&sprite->type->hitbox) sprite->type->hitbox(x,y,w,h,sprite);
+  else {
+    *x=sprite->x-(FMN_MM_PER_TILE>>1);
+    *y=sprite->y-(FMN_MM_PER_TILE>>1);
+    *w=FMN_MM_PER_TILE;
+    *h=FMN_MM_PER_TILE;
+  }
+}
 
 /* There is a global list of active sprites.
  * It may be sparse, and objects may move around between updates.
@@ -71,5 +94,6 @@ void fmn_spritev_update();
 extern const struct fmn_sprite_type fmn_sprite_type_dummy;
 extern const struct fmn_sprite_type fmn_sprite_type_hero;
 extern const struct fmn_sprite_type fmn_sprite_type_bug;
+extern const struct fmn_sprite_type fmn_sprite_type_pushblock;
 
 #endif

@@ -75,9 +75,10 @@ static uint8_t fmn_hero_check_cells() {
 #define FMN_HERO_NUDGE_INTERVAL (FMN_MM_PER_TILE)
 #define FMN_HERO_NUDGE_SPEED 10
  
-static void fmn_hero_nudge(int16_t *v) {
+static uint8_t fmn_hero_nudge(int16_t *v) {
+  //TODO We're bypassing collision detection here. Is that OK?
   int16_t mod=((*v)-(FMN_MM_PER_TILE>>1))%FMN_HERO_NUDGE_INTERVAL;
-  if (!mod) return;
+  if (!mod) return 0;
   if (mod>=FMN_HERO_NUDGE_INTERVAL>>1) {
     if (mod>FMN_HERO_NUDGE_INTERVAL-FMN_HERO_NUDGE_SPEED) (*v)+=FMN_HERO_NUDGE_INTERVAL-mod;
     else (*v)+=FMN_HERO_NUDGE_SPEED;
@@ -85,6 +86,7 @@ static void fmn_hero_nudge(int16_t *v) {
     if (mod<FMN_HERO_NUDGE_SPEED) (*v)-=mod;
     else (*v)-=FMN_HERO_NUDGE_SPEED;
   }
+  return 1;
 }
 
 /* Target speed and acceleration.
@@ -133,12 +135,18 @@ void fmn_hero_update_walk() {
     }
   } else return;
 
+  struct fmn_sprite *pumpkin=0;
   if (!fmn_hero_move_with_physics(
+    &pumpkin,
     fmn_hero.walkspeed*fmn_hero.walkdx,
     fmn_hero.walkspeed*fmn_hero.walkdy
   )) {
-    if (!fmn_hero.indx&&fmn_hero.indy) fmn_hero_nudge(&fmn_hero.x);
-    else if (fmn_hero.indx&&!fmn_hero.indy) fmn_hero_nudge(&fmn_hero.y);
+    uint8_t nudged=0;
+    if (!fmn_hero.indx&&fmn_hero.indy) nudged=fmn_hero_nudge(&fmn_hero.x);
+    else if (fmn_hero.indx&&!fmn_hero.indy) nudged=fmn_hero_nudge(&fmn_hero.y);
+    if (!nudged) {
+      if (pumpkin&&pumpkin->type->push) pumpkin->type->push(pumpkin,fmn_hero.walkdx,fmn_hero.walkdy);
+    }
     return;
   }
   

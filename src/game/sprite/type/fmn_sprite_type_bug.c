@@ -13,6 +13,7 @@ static void _bug_init(struct fmn_sprite *sprite,const uint8_t *argv,uint8_t argc
   sprite->tilesheet=&fmnr_image_sprites1;
   sprite->tileid=0x00;
   sprite->xform=0;
+  sprite->flags=0;
   tileid0=sprite->tileid;
 }
 
