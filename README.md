@@ -1,1 +1,45 @@
 # Full Moon
+
+## TODO
+
+- [ ] Editor
+- - [ ] Map
+- - [ ] Tilesheet
+- - [ ] Wave
+- - [ ] Song
+- [ ] Targets
+- - [ ] Web
+- - [ ] Linux DRM
+- - [ ] Windows
+- - [ ] MacOS
+- - [ ] Thumby
+- - [ ] Picosystem
+- - [ ] Mac 68k
+- - [ ] Pippin
+- - [ ] Playdate
+- - [ ] PocketStar
+- [ ] HP, damage
+- [ ] Save game
+- [ ] Spriteless treadle and stompbox
+- [ ] Map-based events
+- [ ] Weapons
+- - [ ] Broom
+- - [ ] Umbrella
+- - [ ] Wand
+- - [ ] Violin
+- - [ ] Chalk
+- - [ ] Pitcher
+- - [ ] Feather
+- - [ ] Matches
+- - [ ] Bell
+- - [ ] Corn
+- [ ] Change hat
+- [ ] Sound effects
+- [ ] Clean up music
+- [ ] Sprites
+- - [ ] Slicer
+- - [ ] Bonfire
+- - [ ] Firewall
+- - [ ] Raccoon
+- - [ ] Sea monster
+- - [ ] Fire nozzle
