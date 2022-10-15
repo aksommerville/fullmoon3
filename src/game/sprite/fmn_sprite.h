@@ -62,6 +62,23 @@ static inline void fmn_sprite_hitbox(int16_t *x,int16_t *y,int16_t *w,int16_t *h
   }
 }
 
+/* Nonzero if a collision exists.
+ * We don't correct or provide details.
+ * Colliding against a box takes optional (source), one sprite to exclude from examination.
+ */
+int fmn_sprite_collide_box(int16_t x,int16_t y,int16_t w,int16_t h,struct fmn_sprite *source,uint8_t features);
+static inline int fmn_sprite_collide(struct fmn_sprite *sprite,uint8_t features) {
+  int16_t x,y,w,h;
+  fmn_sprite_hitbox(&x,&y,&w,&h,sprite);
+  return fmn_sprite_collide_box(x,y,w,h,sprite,features);
+}
+#define FMN_SPRITE_COLLIDE_VACANT    0x01 /* The low four bits correspond to the four map cell values. */
+#define FMN_SPRITE_COLLIDE_SOLID     0x02 /* That's not a coincidence; we depend on it. */
+#define FMN_SPRITE_COLLIDE_HOLE      0x04
+#define FMN_SPRITE_COLLIDE_RESERVED  0x08
+#define FMN_SPRITE_COLLIDE_EDGES     0x10
+#define FMN_SPRITE_COLLIDE_SPRITES   0x20
+
 /* There is a global list of active sprites.
  * It may be sparse, and objects may move around between updates.
  * Sprite addresses are stable except for the functions marked below.

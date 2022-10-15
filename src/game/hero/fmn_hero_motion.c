@@ -133,7 +133,11 @@ void fmn_hero_update_walk() {
       fmn_hero.walkspeed=0;
       return;
     }
-  } else return;
+  } else {
+    fmn_hero.pushable=0;
+    fmn_hero.pushcounter=0;
+    return;
+  }
 
   struct fmn_sprite *pumpkin=0;
   if (!fmn_hero_move_with_physics(
@@ -144,11 +148,26 @@ void fmn_hero_update_walk() {
     uint8_t nudged=0;
     if (!fmn_hero.indx&&fmn_hero.indy) nudged=fmn_hero_nudge(&fmn_hero.x);
     else if (fmn_hero.indx&&!fmn_hero.indy) nudged=fmn_hero_nudge(&fmn_hero.y);
-    if (!nudged) {
-      if (pumpkin&&pumpkin->type->push) pumpkin->type->push(pumpkin,fmn_hero.walkdx,fmn_hero.walkdy);
+    if (pumpkin&&pumpkin->type->push) {
+      if (pumpkin==fmn_hero.pushable) {
+        if (fmn_hero.pushcounter>=FMN_HERO_PUSH_DELAY) {
+          pumpkin->type->push(pumpkin,fmn_hero.walkdx,fmn_hero.walkdy);
+          fmn_hero.pushcounter=0;
+        } else {
+          fmn_hero.pushcounter++;
+        }
+      } else {
+        fmn_hero.pushable=pumpkin;
+        fmn_hero.pushcounter=0;
+      }
+    } else {
+      fmn_hero.pushable=0;
+      fmn_hero.pushcounter=0;
     }
     return;
   }
+  fmn_hero.pushable=0;
+  fmn_hero.pushcounter=0;
   
   if (fmn_hero_check_edge_navigation()) return;
   if (fmn_hero_check_cells()) return;

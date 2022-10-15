@@ -12,6 +12,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#define FMN_HERO_PUSH_DELAY 20
+
 extern struct fmn_hero {
   int16_t x,y; // Center, mm.
   int8_t col,row; // Most recent position, in tiles.
@@ -25,6 +27,8 @@ extern struct fmn_hero {
   uint8_t animframe;
   int16_t walkspeed;
   int8_t walkdx,walkdy;
+  struct fmn_sprite *pushable;
+  uint8_t pushcounter; // counts up until we allow to push
   
 } fmn_hero;
 
