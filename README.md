@@ -4,9 +4,19 @@
 
 - [ ] Editor
 - - [ ] Map
+- - - [x] MapController.onEditCommand
+- - - [ ] Neighbor-joining pencil.
+- - - [ ] MapCommands (flat list)
+- - - [ ] Hotkeys to select tool.
 - - [ ] Tilesheet
 - - [ ] Wave
 - - [ ] Song
+- - [ ] Launch from editor, at the current map if one is open
+- - [ ] New datalists (NewMapCommandModal)
+- - - [ ] Flags (for map "cellif" command)
+- - - [ ] Sprite controller
+- - - [ ] Events
+- - - [ ] Hooks
 - [ ] Targets
 - - [ ] Web
 - - [ ] Linux DRM

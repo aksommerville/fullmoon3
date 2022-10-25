@@ -84,7 +84,11 @@ void fmn_spritev_sort_full() {
  */
 
 struct fmn_sprite *fmn_sprite_alloc() {
-  if (fmn_spritec<FMN_SPRITE_LIMIT) return fmn_spritev+fmn_spritec++;
+  if (fmn_spritec<FMN_SPRITE_LIMIT) {
+    struct fmn_sprite *sprite=fmn_spritev+fmn_spritec++;
+    memset(sprite,0,sizeof(struct fmn_sprite));
+    return sprite;
+  }
   struct fmn_sprite *sprite=fmn_spritev;
   uint8_t i=FMN_SPRITE_LIMIT;
   for (;i-->0;sprite++) {

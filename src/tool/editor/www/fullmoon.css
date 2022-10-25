@@ -1,0 +1,302 @@
+/* Global, shared.
+ *****************************************************************************/
+
+html {
+  background-color: #aaa;
+  color: #000;
+  font-family: sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.modalBlotter {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  background-color: #000;
+  opacity: 0.8;
+}
+
+.modalStack {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 101;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalStack .modalFrame {
+  background-color: #fff;
+  border: 1px solid #000;
+  border-radius: 1em;
+  box-shadow: #000 0 0 2em 0.5em;
+  padding: 1em;
+}
+
+/* RootController.
+ ******************************************************************************/
+ 
+.RootController {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: stretch;
+  width: 100vw;
+  height: 100vh;
+}
+
+.RootController > .content {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden; /* its height matches the window exactly, but Firefox still wants a tiny vertical scroll :( */
+}
+
+.RootController > .content > * {
+  flex: 1;
+}
+
+/* ToolbarController.
+ ****************************************************************************/
+ 
+.ToolbarController {
+  background-color: #222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  border-right: 1px solid #000;
+}
+
+.ToolbarController > .status {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.ToolbarController > .status > input {
+  flex: 1;
+}
+
+.ToolbarController > .status > .indicator {
+  min-width: 2em;
+  min-height: 2em;
+  background-color: #888;
+  border-radius: 1em;
+  margin: 0.2em;
+}
+
+.ToolbarController > .status > .indicator.clean { background-color: #0f0; }
+.ToolbarController > .status > .indicator.dirty { background-color: #f00; }
+.ToolbarController > .status > .indicator.pending { background-color: #ff0; }
+
+.ToolbarController > .viewsMenu {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.ToolbarController > .commandsMenu {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.ToolbarController > .resources {
+  flex: 1;
+  overflow-y: scroll;
+  list-style-type: none;
+  padding: 0 0.5em;
+  margin: 0;
+}
+
+.ToolbarController > .resources .restype-label {
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 0.25em;
+}
+
+.ToolbarController > .resources ul.restype {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  background-color: #333;
+}
+
+.ToolbarController > .resources ul.restype > li {
+  cursor: pointer;
+}
+
+/* MapController.
+ *****************************************************************/
+ 
+.MapController {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+.MapCanvas {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+.MapController .toolbar {
+  min-width: 100px;
+  max-width: 200px;
+  background-color: #222;
+  border-left: 1px solid #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.MapToolbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.MapToolbox .selectedTile {
+  width: 32px;
+  height: 32px;
+  border: 4px solid #fff;
+}
+
+.MapToolbox label.tool > img {
+  background-color: default;
+}
+
+.MapToolbox label.tool > input:checked + img {
+  background-color: #ff0;
+}
+
+.MapPaletteModal img {
+  width: 512px;
+  height: 512px;
+  image-rendering: crisp-edges;
+}
+
+.NewMapCommandModal table.volatile {
+  /* avoid re-centering when type changes */
+  min-width: 500px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.NewMapCommandModal table.volatile td.key {
+  text-align: right;
+  font-weight: bold;
+  min-width: 150px;
+}
+
+/* ImageController.
+ ****************************************************************************/
+
+.ImageController {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.ImageController .controls {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+ 
+.ImageController input + label.visibilityToggle {
+  background-color: #888;
+  padding: 0.25em 0.5em;
+  border: 1px solid #000;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ImageController input:checked + label.visibilityToggle {
+  background-color: #ff0;
+}
+
+.ImageController > canvas {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.TileModal {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.TileModal > .idRow {
+  display: flex;
+  flex-direction: row;
+  align-items: bottom;
+  justify-content: stretch;
+}
+
+.TileModal .thumbnail {
+  width: 32px;
+  height: 32px;
+  image-rendering: crisp-edges;
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.TileModal > .idRow > .tileid {
+  flex: 1;
+}
+
+.TileModal .navigation {
+  display: flex;
+  flex-direction: row;
+}
+
+.TileModal .vertNav {
+  display: flex;
+  flex-direction: column;
+}
+
+.TileModal > .propsRow {
+  display: flex;
+  flex-direction: row;
+  align-items: top;
+}
+
+.TileModal > .propsRow > .leftColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.TileModal > .propsRow > .leftColumn > label {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.TileModal input[type="number"] {
+  width: 50px;
+}

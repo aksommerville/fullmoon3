@@ -19,10 +19,19 @@ static inline int fmn_digit_eval(char src) {
 }
  
 int fmn_int_eval(int *dst,const char *src,int srcc);
+int fmn_decsint_repr(char *dst,int dsta,int src);
 
 int fmn_for_each_comma_string(const char *src,int srcc,int (*cb)(const char *src,int srcc,void *userdata),void *userdata);
 
 int fmn_vlq_decode(int *dst,const void *src,int srcc);
+
+int fmn_memcasecmp(const void *a,const void *b,int c);
+
+// The only special thing is '*', matches any amount of anything. No escapes.
+int fmn_wildcard_match(const char *pat,int patc,const char *src,int srcc);
+
+int fmn_string_eval(char *dst,int dsta,const char *src,int srcc);
+int fmn_string_repr(char *dst,int dsta,const char *src,int srcc);
 
 /* Encoder.
  ******************************************************/
@@ -30,6 +39,7 @@ int fmn_vlq_decode(int *dst,const void *src,int srcc);
 struct fmn_encoder {
   uint8_t *v;
   int c,a;
+  int jsonctx;
 };
 
 void fmn_encoder_cleanup(struct fmn_encoder *encoder);
@@ -40,6 +50,26 @@ int fmn_encode_raw(struct fmn_encoder *encoder,const void *src,int srcc);
 int fmn_encode_fmt(struct fmn_encoder *encoder,const char *fmt,...);
 
 int fmn_encode_u8(struct fmn_encoder *encoder,uint8_t src);
+
+int fmn_encode_decsint(struct fmn_encoder *encoder,int src);
+int fmn_encode_string(struct fmn_encoder *encoder,const char *src,int srcc);
+int fmn_encode_base64(struct fmn_encoder *encoder,const void *src,int srcc);
+
+/* If you're inside an object, you *must* supply a key, and if not you *must not*.
+ * Close an object or array by providing the context token given when you opened it.
+ * "preencoded" to emit one value already in JSON format. If you break encoding, that's on you.
+ * You can insert whitespace freely at any time, but any other non-JSON insertions might break our comma placement.
+ */
+int fmn_encode_json_preencoded(struct fmn_encoder *encoder,const char *k,int kc,const char *v,int vc);
+int fmn_encode_json_array_start(struct fmn_encoder *encoder,const char *k,int kc); // => jsonctx
+int fmn_encode_json_object_start(struct fmn_encoder *encoder,const char *k,int kc); // => jsonctx
+int fmn_encode_json_array_end(struct fmn_encoder *encoder,int jsonctx);
+int fmn_encode_json_object_end(struct fmn_encoder *encoder,int jsonctx);
+
+int fmn_encode_json_null(struct fmn_encoder *encoder,const char *k,int kc);
+int fmn_encode_json_boolean(struct fmn_encoder *encoder,const char *k,int kc,int v);
+int fmn_encode_json_int(struct fmn_encoder *encoder,const char *k,int kc,int v);
+int fmn_encode_json_string(struct fmn_encoder *encoder,const char *k,int kc,const char *v,int vc);
 
 /* Decoder.
  ******************************************************/

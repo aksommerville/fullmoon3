@@ -14,3 +14,4 @@ These are the tile physics:
 Subsequent tables are for the editor only:
   - neighbor mask
   - family
+  - probability (inverse! 0=preferred, 254=very unlikely, 255=by appointment only)

@@ -3,7 +3,7 @@
 tool_MIDDIR:=mid/tool
 tool_OUTDIR:=out/tool
 
-tool_OPT_ENABLE:=fs serial
+tool_OPT_ENABLE:=fs serial http
 
 tool_CCDEF:=$(addprefix -DFMN_USE_,$(tool_OPT_ENABLE))
 tool_CCWARN:=-Werror -Wimplicit
@@ -33,3 +33,4 @@ define tool_RULES
 endef
 $(foreach T,$(tool_NAMES),$(eval $(call tool_RULES,$T)))
 
+edit:$(tool_EXE_editor);$(tool_EXE_editor)
