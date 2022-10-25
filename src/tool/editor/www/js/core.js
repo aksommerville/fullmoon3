@@ -82,6 +82,14 @@ export class Dom {
     
     this.mutationObserver = new this.window.MutationObserver((events) => this.onMutations(events));
     this.mutationObserver.observe(this.document.body, { childList: true, subtree: true });
+    
+    this.window.addEventListener("keydown", (event) => {
+      if (event.code === "Escape") {
+        this.dismissModals();
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    });
   }
   
   onMutations(records) {
@@ -140,6 +148,14 @@ export class Dom {
     const frame = this._spawnModalFrame();
     const controller = this.spawnController(frame, clazz, overrides);
     return controller;
+  }
+  
+  getTopModalController() {
+    const frames = Array.from(this.document.body.querySelectorAll(".modalFrame"));
+    if (!frames.length) return null;
+    const frame = frames[frames.length - 1];
+    const element = frame.children[0];
+    return element._fmn_controller;
   }
   
   tagNameForControllerClass(clazz) {

@@ -3,12 +3,13 @@
 ## TODO
 
 - [ ] Editor
-- - [ ] Map
+- - [x] Map
 - - - [x] MapController.onEditCommand
-- - - [ ] Neighbor-joining pencil.
-- - - [ ] MapCommands (flat list)
-- - - [ ] Hotkeys to select tool.
-- - [ ] Tilesheet
+- - - [x] Neighbor-joining pencil.
+- - - [x] MapCommands (flat list)
+- - - [x] Hotkeys to select tool.
+- - [x] Esc to dismiss modal
+- - [x] Tilesheet
 - - [ ] Wave
 - - [ ] Song
 - - [ ] Launch from editor, at the current map if one is open
@@ -17,6 +18,7 @@
 - - - [ ] Sprite controller
 - - - [ ] Events
 - - - [ ] Hooks
+- - [x] All-maps view
 - [ ] Targets
 - - [ ] Web
 - - [ ] Linux DRM

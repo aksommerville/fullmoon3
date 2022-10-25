@@ -34,6 +34,14 @@ export class MapToolbox {
     this._renderSelectedTile();
   }
   
+  setTool(name) {
+    for (const element of this.element.querySelectorAll(".tool input:checked")) element.checked = false;
+    const element = this.element.querySelector(`.tool input[value='${name}'`);
+    if (!element) return;
+    element.checked = true;
+    this.onToolChanged();
+  }
+  
   _buildUi() {
     this.element.innerHTML = "";
     

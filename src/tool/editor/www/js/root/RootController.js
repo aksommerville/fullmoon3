@@ -9,6 +9,7 @@ import { MapService } from "/js/map/MapService.js";
 import { MapController } from "/js/map/MapController.js";
 import { LaunchService } from "/js/LaunchService.js";
 import { ImageController } from "/js/image/ImageController.js";
+import { AllMapsView } from "/js/misc/AllMapsView.js";
 
 export class RootController {
   static getDependencies() {
@@ -39,6 +40,7 @@ export class RootController {
     const fragmentComponents = fragment.split("/").filter(a => a);
     switch (fragmentComponents[0]) {
       case "res": return this.setBodyViewRes(fragmentComponents[1], fragmentComponents[2], fragmentComponents.slice(3));
+      case "allmaps": return this.setBodyViewController(AllMapsView, fragmentComponents.slice(1));
     }
     this.setBodyViewDefault();
   }
@@ -52,12 +54,15 @@ export class RootController {
     this.toolbar.onShowSpecialView = (name) => this.onShowSpecialView(name);
     this.toolbar.onCommand = (name) => this.onCommand(name);
     this.toolbar.onShowResource = (type, name, path) => this.onShowResource(type, name, path);
-    this.toolbar.setSpecialViewNames([]);
+    this.toolbar.setSpecialViewNames(["All maps"]);
     this.toolbar.setCommandNames(["Launch", "New map"]);
     this.toolbar.setResourceToc(this.resService.toc);
     
     this.dom.spawn(this.element, "DIV", ["content"]);
   }
+  
+  /* Body view.
+   ***************************************************************/
   
   setBodyViewDefault() {
     const contentPanel = this.element.querySelector(".content");
@@ -73,6 +78,13 @@ export class RootController {
     if (error) {
       this.dom.spawn(contentPanel, "DIV", ["error"], error.message || error.toString());
     }
+  }
+  
+  setBodyViewController(clazz, args) {
+    const contentPanel = this.element.querySelector(".content");
+    contentPanel.innerHTML = "";
+    const controller = this.dom.spawnController(contentPanel, clazz);
+    controller.setup?.(...args);
   }
   
   setBodyViewRes(type, name, args) {
@@ -134,13 +146,12 @@ export class RootController {
    *****************************************************************************/
   
   onSave() {
-    console.log(`TODO RootController.onSave`);
-    //this.toolbar.setSaveStatus("pending");
-    //window.setTimeout(() => this.toolbar.setSaveStatus("clean"), 2000);
+    // We're not using this; saving is automatic and invisible. Delete it.
   }
   
   onShowSpecialView(name) {
     switch (name) {
+      case "All maps": this.window.location = `${this.window.location.pathname}#/allmaps/begin`; break;
       default: console.log(`RootController.onShowSpecialView '${name}'`);
     }
   }

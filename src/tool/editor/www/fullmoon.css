@@ -158,8 +158,8 @@ body {
 }
 
 .MapController .toolbar {
-  min-width: 100px;
-  max-width: 200px;
+  min-width: 200px;
+  max-width: 300px;
   background-color: #222;
   border-left: 1px solid #000;
   color: #fff;
@@ -207,6 +207,35 @@ body {
   text-align: right;
   font-weight: bold;
   min-width: 150px;
+}
+
+.MapCommands .buttonsRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.MapCommands ul.commands {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.MapCommands button {
+  background-color: #ccc;
+  color: #000;
+  font: 9px monospace;
+}
+
+.MapCommands button.danger {
+  background-color: #f00;
+  border-left-color: #f88;
+  border-top-color: #f88;
+  border-bottom-color: #800;
+  border-right-color: #800;
+}
+
+.MapCommands button.edit {
+  margin-left: 0.25em;
 }
 
 /* ImageController.
@@ -299,4 +328,13 @@ body {
 
 .TileModal input[type="number"] {
   width: 50px;
+}
+
+/* AllMapsView.
+ ************************************************************/
+
+.AllMapsView {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
