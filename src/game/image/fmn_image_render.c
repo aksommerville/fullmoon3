@@ -42,7 +42,7 @@ void fmn_image_fill_rect(struct fmn_image *image,int16_t x,int16_t y,int16_t w,i
         int16_t alignr=(x+w)&~3;
         if (alignr>alignl) {
           uint8_t byte=pixel|pixel<<2; byte|=byte<<4;
-          int16_t bc=w>>2;
+          int16_t bc=(alignr-alignl)>>2;
           uint8_t *dstrow=((uint8_t*)image->v)+y*image->stride+(alignl>>2);
           int8_t yi=h;
           for (;yi-->0;dstrow+=image->stride) memset(dstrow,byte,bc);

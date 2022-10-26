@@ -8,6 +8,7 @@
 #include "game/image/fmn_image.h"
 #include "game/map/fmn_map.h"
 #include "game/sprite/fmn_sprite.h"
+#include "game/state/fmn_state.h"
 #include "game/fmn_data.h"
 #include <string.h>
 #include <stdio.h>
@@ -30,6 +31,8 @@ extern struct fmn_hero {
   struct fmn_sprite *pushable;
   uint8_t pushcounter; // counts up until we allow to push
   
+  int8_t action; // itemid; <0 if none in progress. Does not necessarily match state's selected action.
+  
 } fmn_hero;
 
 // Call when input state changes. These functions will update (fmn_hero.in*)
@@ -38,6 +41,7 @@ void fmn_hero_event_buttons(uint8_t a,uint8_t b);
 
 void fmn_hero_update_walk();
 void fmn_hero_update_animation();
+void fmn_hero_update_action();
 
 /* Only the hero enjoys full collision detection (in other games, this would usually be a sprite concern).
  * I figure the hero will be the only one that needs the full treatment, and it's inconvenient to sync the sprite before and after.

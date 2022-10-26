@@ -11,6 +11,7 @@ void fmn_hero_reset() {
   fmn_hero.y=(FMN_ROWC*FMN_MM_PER_TILE)>>1;
   fmn_hero.col=fmn_hero.row=-1;
   fmn_hero.facedir=FMN_DIR_E;
+  fmn_hero.action=-1;
 }
 
 /* Trivial public accessors.
@@ -59,4 +60,5 @@ void fmn_hero_input(uint8_t input,uint8_t pvinput) {
 void fmn_hero_update() {
   fmn_hero_update_walk();
   fmn_hero_update_animation();
+  fmn_hero_update_action();
 }

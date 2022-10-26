@@ -4,6 +4,7 @@
 #include "game/map/fmn_map.h"
 #include "game/hero/fmn_hero.h"
 #include "game/sprite/fmn_sprite.h"
+#include "game/state/fmn_state.h"
 #include "game/fmn_data.h"
 #include "fmn_play.h"
 #include <stdio.h>
@@ -62,6 +63,7 @@ static int8_t fmn_game_cb_mapcmd_load(uint8_t cmd,const uint8_t *argv,uint8_t ar
 void fmn_game_reset() {
   fmn_hero_reset();
   fmn_spritev_clear();
+  fmn_state_reset_items();
   
   fmn_map_decode(&fmn_map,&fmnr_map_begin);
   struct fmn_game_cb_mapcmd_load_context ctx={0};

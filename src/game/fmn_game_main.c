@@ -27,6 +27,12 @@ void fmn_game_mode_set_play() {
   // Do not fmn_game_reset() here. Changing mode might mean like returning from the pause screen.
 }
 
+void fmn_game_mode_set_pause() {
+  if (fmn_game_mode==FMN_GAME_MODE_PAUSE) return;
+  fmn_game_mode=FMN_GAME_MODE_PAUSE;
+  fmn_game_mode_pause_init();
+}
+
 /* Setup.
  */
 
@@ -45,6 +51,7 @@ void loop() {
     switch (fmn_game_mode) {
       case FMN_GAME_MODE_TITLE: fmn_game_mode_title_input(input,pvinput); break;
       case FMN_GAME_MODE_PLAY: fmn_game_mode_play_input(input,pvinput); break;
+      case FMN_GAME_MODE_PAUSE: fmn_game_mode_pause_input(input,pvinput); break;
     }
     
     pvinput=input;
@@ -53,6 +60,7 @@ void loop() {
   switch (fmn_game_mode) {
     case FMN_GAME_MODE_TITLE: break;
     case FMN_GAME_MODE_PLAY: fmn_game_mode_play_update(); break;
+    case FMN_GAME_MODE_PAUSE: fmn_game_mode_pause_update(); break;
   }
   
   struct fmn_image *fb=fmn_platform_video_begin();
@@ -61,6 +69,7 @@ void loop() {
     switch (fmn_game_mode) {
       case FMN_GAME_MODE_TITLE: fmn_game_mode_title_render(fb); break;
       case FMN_GAME_MODE_PLAY: fmn_game_mode_play_render(fb); break;
+      case FMN_GAME_MODE_PAUSE: fmn_game_mode_pause_render(fb); break;
     }
     
     fmn_platform_video_end(fb);
