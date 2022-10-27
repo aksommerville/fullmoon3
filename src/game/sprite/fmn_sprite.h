@@ -31,6 +31,10 @@ struct fmn_sprite_type {
   
   // Hero walks directly into sprite (implies that sprite is SOLID).
   void (*push)(struct fmn_sprite *sprite,int8_t dx,int8_t dy);
+  
+  // Hero tickles this sprite with a feather, on this sprite's (dir) edge.
+  // Will be called once per frame while the tickle continues.
+  void (*feather)(struct fmn_sprite *sprite,uint8_t dir);
 };
 
 /* Generic sprite instance.

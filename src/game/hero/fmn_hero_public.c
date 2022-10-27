@@ -61,4 +61,14 @@ void fmn_hero_update() {
   fmn_hero_update_walk();
   fmn_hero_update_animation();
   fmn_hero_update_action();
+  
+  // We have to update the sprite again, otherwise sprites lower than ours in the list will see our prior position instead of current.
+  uint8_t i=fmn_spritec;
+  struct fmn_sprite *sprite=fmn_spritev;
+  for (;i-->0;sprite++) {
+    if (sprite->type==&fmn_sprite_type_hero) {
+      fmn_hero_sprite_update(sprite);
+      break;
+    }
+  }
 }

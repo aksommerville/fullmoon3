@@ -34,6 +34,7 @@ extern struct fmn_hero {
   uint8_t pushcounter; // counts up until we allow to push
   
   int8_t action; // itemid; <0 if none in progress. Does not necessarily match state's selected action.
+  uint16_t actiontime; // frames since action started
   
 } fmn_hero;
 
@@ -55,5 +56,7 @@ int16_t fmn_hero_move_with_physics(struct fmn_sprite **pumpkin,int16_t dx,int16_
 
 // Returns bitfields (1<<physics)
 uint8_t fmn_hero_get_physics_underfoot();
+
+void fmn_hero_sprite_update(struct fmn_sprite *sprite);
 
 #endif

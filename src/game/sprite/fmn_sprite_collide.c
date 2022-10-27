@@ -2,6 +2,7 @@
 #include "game/map/fmn_map.h"
 #include "game/play/fmn_play.h"
 #include "game/image/fmn_image.h"
+#include <stdio.h>
 
 /* Map.
  */
