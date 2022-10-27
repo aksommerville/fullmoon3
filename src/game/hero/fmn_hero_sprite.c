@@ -16,11 +16,70 @@ static void _hero_update(struct fmn_sprite *sprite) {
   sprite->y=fmn_hero.y;
 }
 
+/* Render while riding broom.
+ */
+ 
+static void fmn_hero_render_broom(struct fmn_image *fb,int16_t x,int16_t y) {
+  //TODO
+  int16_t dstx=x-FMN_TILESIZE;
+  int16_t dsty=y-FMN_TILESIZE-((FMN_TILESIZE*4)/8);
+  if (fmn_hero.renderseq&1) {
+    fmn_image_fill_rect(fb,x-(FMN_TILESIZE>>1),dsty+(FMN_TILESIZE<<1)-1,FMN_TILESIZE,1,0);
+  }
+  fmn_image_blit(fb,dstx,dsty,&fmnr_image_hero,48,40,FMN_TILESIZE<<1,FMN_TILESIZE<<1,(fmn_hero.stickydx<0)?FMN_XFORM_XREV:0);
+}
+
+/* Render while using wand.
+ */
+ 
+static void fmn_hero_render_wand(struct fmn_image *fb,int16_t x,int16_t y) {
+  //TODO
+}
+
+/* Render while using violin.
+ */
+ 
+static void fmn_hero_render_violin(struct fmn_image *fb,int16_t x,int16_t y) {
+  //TODO
+}
+
+/* Render carried item, 2 tiles wide.
+ */
+ 
+static void fmn_hero_render_carry_wide(struct fmn_image *fb,int16_t x,int16_t y,uint8_t tileid) {
+  switch (fmn_hero.facedir) {
+    case FMN_DIR_E: {
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE>>1),y,&fmnr_image_hero,tileid,0);
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE>>1),y,&fmnr_image_hero,tileid+1,0);
+      } break;
+    case FMN_DIR_W: {
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE>>1),y,&fmnr_image_hero,tileid+1,FMN_XFORM_XREV);
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE>>1),y,&fmnr_image_hero,tileid,FMN_XFORM_XREV);
+      } break;
+    case FMN_DIR_N: {
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE>>1),y-FMN_TILESIZE,&fmnr_image_hero,tileid+0x10,0);
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE>>1),y,&fmnr_image_hero,tileid+0x20,0);
+      } break;
+    case FMN_DIR_S: {
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE>>1),y-FMN_TILESIZE,&fmnr_image_hero,tileid+0x10,0);
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE>>1),y,&fmnr_image_hero,tileid+0x20,0);
+      } break;
+  }
+}
+
 /* Render.
  */
  
 static void _hero_render(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t x,int16_t y) {
   const struct fmn_image *src=&fmnr_image_hero;
+  fmn_hero.renderseq++;
+  
+  // Actions that replace the whole thing while in progress.
+  switch (fmn_hero.action) {
+    case FMN_ITEM_broom: fmn_hero_render_broom(fb,x,y); return;
+    case FMN_ITEM_wand: fmn_hero_render_wand(fb,x,y); return;
+    case FMN_ITEM_violin: fmn_hero_render_violin(fb,x,y); return;
+  }
   
   // Body.
   uint8_t bodyframe;
@@ -40,6 +99,24 @@ static void _hero_render(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t 
     case FMN_DIR_S: fmn_image_blit_tile(fb,x,dsty,src,0x13,0); break;
     case FMN_DIR_W: fmn_image_blit_tile(fb,x,dsty,src,0x11,FMN_XFORM_XREV); break;
     case FMN_DIR_E: fmn_image_blit_tile(fb,x,dsty,src,0x11,0); break;
+  }
+  
+  // Item.
+  uint8_t itemid=fmn_state_get_selected_item_if_possessed();
+  switch (itemid) {
+    case FMN_ITEM_broom: fmn_hero_render_carry_wide(fb,x,y,0x40); break;
+    case FMN_ITEM_feather:break;
+    case FMN_ITEM_wand:break;
+    case FMN_ITEM_violin:break;
+    case FMN_ITEM_bell:break;
+    case FMN_ITEM_chalk:break;
+    case FMN_ITEM_pitcher:break;
+    case FMN_ITEM_coin:break;
+    case FMN_ITEM_match:break;
+    case FMN_ITEM_corn:break;
+    case FMN_ITEM_umbrella: fmn_hero_render_carry_wide(fb,x,y,0x42); break;
+    case FMN_ITEM_shovel: fmn_hero_render_carry_wide(fb,x,y,0x44); break;
+    case FMN_ITEM_compass:break;
   }
   
   // Hat.

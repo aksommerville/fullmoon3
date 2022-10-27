@@ -27,7 +27,9 @@ extern struct fmn_hero {
   uint8_t animclock;
   uint8_t animframe;
   int16_t walkspeed;
+  uint8_t renderseq;
   int8_t walkdx,walkdy;
+  int8_t stickydx,stickydy;
   struct fmn_sprite *pushable;
   uint8_t pushcounter; // counts up until we allow to push
   
@@ -50,5 +52,8 @@ void fmn_hero_update_action();
  * Motion should not be far enough to cross two cell boundaries, we assume there's no more than one.
  */
 int16_t fmn_hero_move_with_physics(struct fmn_sprite **pumpkin,int16_t dx,int16_t dy);
+
+// Returns bitfields (1<<physics)
+uint8_t fmn_hero_get_physics_underfoot();
 
 #endif

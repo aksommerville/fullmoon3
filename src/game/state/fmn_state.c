@@ -58,3 +58,8 @@ uint8_t fmn_state_adjust_item_count(uint8_t itemid,int8_t d) {
   fmn_state_item_count[itemid]=nc;
   return 1;
 }
+
+uint8_t fmn_state_get_selected_item_if_possessed() {
+  if (!(fmn_state_item_possessed&(1<<fmn_state_item_selected))) return 0xff;
+  return fmn_state_item_selected;
+}

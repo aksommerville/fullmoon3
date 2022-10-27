@@ -90,20 +90,22 @@ static uint8_t fmn_hero_nudge(int16_t *v) {
 }
 
 /* Target speed and acceleration.
- * TODO These should all be different when flying.
  * TODO Slippery floors, that kind of thing?
  * Note that deceleration is positive.
  */
  
 static int16_t fmn_hero_get_target_speed() {
+  if (fmn_hero.action==FMN_ITEM_broom) return FMN_MM_PER_TILE/5;
   return FMN_MM_PER_TILE/10;
 }
 
 static int16_t fmn_hero_get_acceleration() {
+  if (fmn_hero.action==FMN_ITEM_broom) return 25;
   return 30;
 }
 
 static int16_t fmn_hero_get_deceleration() {
+  if (fmn_hero.action==FMN_ITEM_broom) return 10;
   return 20;
 }
 

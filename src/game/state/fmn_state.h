@@ -20,6 +20,7 @@ uint16_t fmn_state_get_possessed_items(); // => bitfields, 1<<itemid
 void fmn_state_add_possessed_item(uint8_t itemid); // Possession is forever; no "remove"
 uint8_t fmn_state_get_item_count(uint8_t itemid); // => 255 if uncounted, 0..254 otherwise
 uint8_t fmn_state_adjust_item_count(uint8_t itemid,int8_t d); // => nonzero if changed; we manage clamping etc
+uint8_t fmn_state_get_selected_item_if_possessed(); // 0..15; or 255 if not possessed
 // itemid:
 #define FMN_ITEM_broom       0
 #define FMN_ITEM_feather     1

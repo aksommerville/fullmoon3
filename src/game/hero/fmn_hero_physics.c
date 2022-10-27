@@ -1,5 +1,35 @@
 #include "fmn_hero_internal.h"
 
+/* Get physics for all cells under the hero.
+ */
+ 
+uint8_t fmn_hero_get_physics_underfoot() {
+  if (!fmn_map.tilesheet) return 0;
+  const uint8_t *tileprops=fmn_map.tilesheet->tileprops;
+  if (!tileprops) return 0;
+  int16_t l=fmn_hero.x-(FMN_MM_PER_TILE>>1);
+  int16_t t=fmn_hero.y-(FMN_MM_PER_TILE>>1);
+  int16_t r=l+FMN_MM_PER_TILE;
+  int16_t b=t+FMN_MM_PER_TILE;
+  int16_t cola=l/FMN_MM_PER_TILE; if (cola<0) cola=0;
+  int16_t rowa=t/FMN_MM_PER_TILE; if (rowa<0) rowa=0;
+  int16_t colz=(r-1)/FMN_MM_PER_TILE; if (colz>=FMN_COLC) colz=FMN_COLC-1;
+  int16_t rowz=(b-1)/FMN_MM_PER_TILE; if (rowz>=FMN_ROWC) rowz=FMN_ROWC-1;
+  if (cola>colz) return 0;
+  if (rowa>rowz) return 0;
+  uint8_t result=0;
+  const uint8_t *cellrow=fmn_map.v+rowa*FMN_COLC+cola;
+  for (;rowa<=rowz;rowa++,cellrow+=FMN_COLC) {
+    const uint8_t *cellp=cellrow;
+    int16_t col=cola;
+    for (;col<=colz;col++,cellp++) {
+      uint8_t prop=(tileprops[(*cellp)>>2]>>(6-(((*cellp)&3)<<1)))&3;
+      result|=1<<prop;
+    }
+  }
+  return result;
+}
+
 /* Escapement log.
  * Each entry is the positive distance you would have to move in each direction, to escape the collision.
  */
@@ -74,7 +104,7 @@ static uint8_t fmn_hero_collide_grid(
       switch (prop) {
         case 0: continue; // vacant
         case 1: break; // solid
-        case 2: break; // hole TODO flying
+        case 2: if (fmn_hero.action==FMN_ITEM_broom) continue; break; // hole
         case 3: break; // reserved ...?
       }
       if (!esc) return 1;
