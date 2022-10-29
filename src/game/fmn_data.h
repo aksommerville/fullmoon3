@@ -6,10 +6,10 @@
 struct fmn_image;
 struct fmn_map_resource;
 
-extern const struct fmn_image fmnr_image_hero;
-extern const struct fmn_image fmnr_image_outdoors;
-extern const struct fmn_image fmnr_image_uibits;
-extern const struct fmn_image fmnr_image_sprites1;
+extern struct fmn_image fmnr_image_hero;
+extern struct fmn_image fmnr_image_outdoors;
+extern struct fmn_image fmnr_image_uibits;
+extern struct fmn_image fmnr_image_sprites1;
 
 //TODO lengths are not necessary; songs must be self-terminated.
 extern const uint8_t fmnr_song_tangled_vine[]; extern const uint16_t fmnr_song_tangled_vine_length;

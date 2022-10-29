@@ -162,6 +162,37 @@ static void fmn_hero_bell_begin() {
   //TODO fire event
 }
 
+/* Chalk.
+ */
+ 
+static struct fmn_sprite *fmn_hero_find_chalkboard() {
+  if (fmn_hero.facedir!=FMN_DIR_N) return 0;
+  int16_t x=fmn_hero.x;
+  int16_t y=fmn_hero.y-FMN_MM_PER_TILE;
+  int16_t r=FMN_MM_PER_TILE>>1;
+  struct fmn_sprite *sprite=fmn_spritev;
+  uint8_t i=fmn_spritec;
+  for (;i-->0;sprite++) {
+    if (sprite->type!=&fmn_sprite_type_chalkboard) continue;
+    if (x<sprite->x-r) continue;
+    if (x>sprite->x+r) continue;
+    if (y<sprite->y-r) continue;
+    if (y>sprite->y+r) continue;
+    return sprite;
+  }
+  return 0;
+}
+ 
+static void fmn_hero_chalk_begin() {
+  // Chalk is only meaningful when facing north, into a chalkboard sprite.
+  // When that happens, we switch out to a completely different app mode.
+  struct fmn_sprite *chalkboard=fmn_hero_find_chalkboard();
+  if (chalkboard) {
+    fmn_game_mode_set_chalk(chalkboard);
+  }
+  fmn_hero.action=-1;
+}
+
 /* Update action.
  */
  
@@ -194,7 +225,7 @@ static void fmn_hero_begin_action() {
     case FMN_ITEM_wand: fmn_hero_wand_begin(); break;
     case FMN_ITEM_violin: fmn_hero_violin_begin(); break;
     case FMN_ITEM_bell: fmn_hero_bell_begin(); break;
-    case FMN_ITEM_chalk: break;//TODO
+    case FMN_ITEM_chalk: fmn_hero_chalk_begin(); break;
     case FMN_ITEM_pitcher: break;//TODO
     case FMN_ITEM_coin: break;//TODO
     case FMN_ITEM_match: break;//TODO

@@ -91,7 +91,7 @@ static int imgcvt_encode_c() {
     OUT("};\n")
   }
   
-  OUT("const struct fmn_image %.*s={\n",namec,name)
+  OUT("struct fmn_image %.*s={\n",namec,name)
   OUT("  .v=(void*)%.*s_storage,\n",namec,name)
   OUT("  .w=%d,\n",imgcvt.image.w)
   OUT("  .h=%d,\n",imgcvt.image.h)

@@ -163,7 +163,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
       case FMN_ITEM_wand: fmn_hero_render_carry_small(fb,x,y,0x53); break;
       case FMN_ITEM_violin: fmn_hero_render_carry_small(fb,x,y,0x55); break;
       case FMN_ITEM_bell: fmn_hero_render_carry_small(fb,x,y,0x5b); break;
-      case FMN_ITEM_chalk:break;
+      case FMN_ITEM_chalk: fmn_hero_render_carry_small(fb,x,y,0x5e); break;
       case FMN_ITEM_pitcher:break;
       case FMN_ITEM_coin:break;
       case FMN_ITEM_match:break;

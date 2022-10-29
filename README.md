@@ -31,7 +31,7 @@
 - - [ ] Umbrella
 - - [x] Wand
 - - [x] Violin
-- - [ ] Chalk
+- - [x] Chalk
 - - [ ] Pitcher
 - - [x] Feather
 - - [ ] Matches

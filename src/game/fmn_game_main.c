@@ -33,6 +33,12 @@ void fmn_game_mode_set_pause() {
   fmn_game_mode_pause_init();
 }
 
+void fmn_game_mode_set_chalk(struct fmn_sprite *chalkboard) {
+  if (fmn_game_mode==FMN_GAME_MODE_CHALK) return;
+  fmn_game_mode=FMN_GAME_MODE_CHALK;
+  fmn_game_mode_chalk_init(chalkboard);
+}
+
 /* Setup.
  */
 
@@ -52,6 +58,7 @@ void loop() {
       case FMN_GAME_MODE_TITLE: fmn_game_mode_title_input(input,pvinput); break;
       case FMN_GAME_MODE_PLAY: fmn_game_mode_play_input(input,pvinput); break;
       case FMN_GAME_MODE_PAUSE: fmn_game_mode_pause_input(input,pvinput); break;
+      case FMN_GAME_MODE_CHALK: fmn_game_mode_chalk_input(input,pvinput); break;
     }
     
     pvinput=input;
@@ -70,6 +77,7 @@ void loop() {
       case FMN_GAME_MODE_TITLE: fmn_game_mode_title_render(fb); break;
       case FMN_GAME_MODE_PLAY: fmn_game_mode_play_render(fb); break;
       case FMN_GAME_MODE_PAUSE: fmn_game_mode_pause_render(fb); break;
+      case FMN_GAME_MODE_CHALK: fmn_game_mode_chalk_render(fb); break;
     }
     
     fmn_platform_video_end(fb);
