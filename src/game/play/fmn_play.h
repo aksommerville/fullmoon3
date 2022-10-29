@@ -23,4 +23,6 @@ struct fmn_sprite *fmn_game_spawn_sprite(
   const uint8_t *argv,uint8_t argc
 );
 
+void fmn_game_create_soulballs(int16_t xmm,int16_t ymm);
+
 #endif

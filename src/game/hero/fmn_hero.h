@@ -17,4 +17,7 @@ void fmn_hero_set_position(int16_t xmm,int16_t ymm);
 void fmn_hero_input(uint8_t input,uint8_t pvinput);
 void fmn_hero_update();
 
+// If hero is currently wagging the feather, FMN_DIR_(W,E,N,S) the direction she's facing.
+uint8_t fmn_hero_get_feather_dir();
+
 #endif

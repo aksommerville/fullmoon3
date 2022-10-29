@@ -82,7 +82,6 @@ static void fmn_hero_begin_action() {
   uint8_t action=fmn_state_get_selected_item();
   if (!(fmn_state_get_possessed_items()&(1<<action))) return;
   fmn_hero.actiontime=0;
-  fprintf(stderr,"TODO %s %d\n",__func__,action);
   switch (fmn_hero.action=action) {
     case FMN_ITEM_broom: break;
     case FMN_ITEM_feather: break;
@@ -107,7 +106,6 @@ static void fmn_hero_begin_action() {
  */
  
 static void fmn_hero_end_action() {
-  fprintf(stderr,"TODO %s\n",__func__);
   switch (fmn_hero.action) {
     case FMN_ITEM_broom: fmn_hero_broom_end(); return;
     case FMN_ITEM_wand: break;//TODO commit spell

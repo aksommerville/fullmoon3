@@ -116,5 +116,13 @@ extern const struct fmn_sprite_type fmn_sprite_type_dummy;
 extern const struct fmn_sprite_type fmn_sprite_type_hero;
 extern const struct fmn_sprite_type fmn_sprite_type_bug;
 extern const struct fmn_sprite_type fmn_sprite_type_pushblock;
+extern const struct fmn_sprite_type fmn_sprite_type_alphabet;
+
+#define FMN_FOR_EACH_SPRITE_TYPE \
+  _(dummy) \
+  _(hero) \
+  _(bug) \
+  _(pushblock) \
+  _(alphabet)
 
 #endif

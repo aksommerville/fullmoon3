@@ -21,14 +21,29 @@ static void _pushblock_init(struct fmn_sprite *sprite,const uint8_t *argv,uint8_
   sprite->layer=-1;
 }
 
+/* Move. Zero if blocked. We move only exactly what's asked for, or nothing.
+ */
+ 
+static uint8_t fmn_pushblock_move(struct fmn_sprite *sprite,int16_t dx,int16_t dy) {
+  sprite->x+=dx;
+  sprite->y+=dy;
+  if (fmn_sprite_collide(sprite,FMN_SPRITE_COLLIDE_SOLID|FMN_SPRITE_COLLIDE_HOLE|FMN_SPRITE_COLLIDE_SPRITES)) {
+    sprite->x-=dx;
+    sprite->y-=dy;
+    return 0;
+  }
+  return 1;
+}
+
 /* Update.
  */
  
 static void _pushblock_update(struct fmn_sprite *sprite) {
   if (movec) {
     movec--;
-    sprite->x+=movedx*FMN_PUSHBLOCK_MOVE_SPEED;
-    sprite->y+=movedy*FMN_PUSHBLOCK_MOVE_SPEED;
+    if (!fmn_pushblock_move(sprite,movedx*FMN_PUSHBLOCK_MOVE_SPEED,movedy*FMN_PUSHBLOCK_MOVE_SPEED)) {
+      movec=0;
+    }
   } else if (charmdir) {
     int16_t herox,heroy;
     fmn_hero_get_position(&herox,&heroy);
@@ -38,37 +53,25 @@ static void _pushblock_update(struct fmn_sprite *sprite) {
           if (heroy<sprite->y-r) return;
           if (heroy>sprite->y+r) return;
           if (herox>sprite->x-r) return;
-          sprite->x-=FMN_PUSHBLOCK_CHARM_SPEED;
-          if (fmn_sprite_collide(sprite,FMN_SPRITE_COLLIDE_SOLID|FMN_SPRITE_COLLIDE_HOLE|FMN_SPRITE_COLLIDE_SPRITES)) {
-            sprite->x+=FMN_PUSHBLOCK_CHARM_SPEED;
-          }
+          fmn_pushblock_move(sprite,-FMN_PUSHBLOCK_CHARM_SPEED,0);
         } break;
       case FMN_DIR_E: {
           if (heroy<sprite->y-r) return;
           if (heroy>sprite->y+r) return;
           if (herox<sprite->x+r) return;
-          sprite->x+=FMN_PUSHBLOCK_CHARM_SPEED;
-          if (fmn_sprite_collide(sprite,FMN_SPRITE_COLLIDE_SOLID|FMN_SPRITE_COLLIDE_HOLE|FMN_SPRITE_COLLIDE_SPRITES)) {
-            sprite->x-=FMN_PUSHBLOCK_CHARM_SPEED;
-          }
+          fmn_pushblock_move(sprite,FMN_PUSHBLOCK_CHARM_SPEED,0);
         } break;
       case FMN_DIR_N: {
           if (herox<sprite->x-r) return;
           if (herox>sprite->x+r) return;
           if (heroy>sprite->y-r) return;
-          sprite->y-=FMN_PUSHBLOCK_CHARM_SPEED;
-          if (fmn_sprite_collide(sprite,FMN_SPRITE_COLLIDE_SOLID|FMN_SPRITE_COLLIDE_HOLE|FMN_SPRITE_COLLIDE_SPRITES)) {
-            sprite->y+=FMN_PUSHBLOCK_CHARM_SPEED;
-          }
+          fmn_pushblock_move(sprite,0,-FMN_PUSHBLOCK_CHARM_SPEED);
         } break;
       case FMN_DIR_S: {
           if (herox<sprite->x-r) return;
           if (herox>sprite->x+r) return;
           if (heroy<sprite->y+r) return;
-          sprite->y+=FMN_PUSHBLOCK_CHARM_SPEED;
-          if (fmn_sprite_collide(sprite,FMN_SPRITE_COLLIDE_SOLID|FMN_SPRITE_COLLIDE_HOLE|FMN_SPRITE_COLLIDE_SPRITES)) {
-            sprite->y-=FMN_PUSHBLOCK_CHARM_SPEED;
-          }
+          fmn_pushblock_move(sprite,0,FMN_PUSHBLOCK_CHARM_SPEED);
         } break;
     }
   }
@@ -81,22 +84,6 @@ static void _pushblock_push(struct fmn_sprite *sprite,int8_t dx,int8_t dy) {
   if (movec) return;
   if (dx&&dy) return;
   if (!dx&&!dy) return;
-  int16_t testx,testy,testw,testh;
-  fmn_sprite_hitbox(&testx,&testy,&testw,&testh,sprite);
-  testx+=8; testy+=8; testw-=16; testh-=16;
-  if (dx<0) { testx-=testw; testw<<=1; }
-  else if (dx>0) testw<<=1;
-  else if (dy<0) { testy-=testh; testh<<=1; }
-  else testh<<=1;
-  if (fmn_sprite_collide_box(
-    testx,testy,testw,testh,sprite,
-    FMN_SPRITE_COLLIDE_SOLID|
-    FMN_SPRITE_COLLIDE_HOLE|
-    FMN_SPRITE_COLLIDE_EDGES|
-    FMN_SPRITE_COLLIDE_SPRITES
-  )) {
-    return;
-  }
   movedx=dx;
   movedy=dy;
   movec=FMN_MM_PER_TILE/FMN_PUSHBLOCK_MOVE_SPEED;

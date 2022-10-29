@@ -30,6 +30,11 @@ void fmn_hero_set_position(int16_t xmm,int16_t ymm) {
   fmn_hero.row=ymm/FMN_MM_PER_TILE;
 }
 
+uint8_t fmn_hero_get_feather_dir() {
+  if (fmn_hero.action!=FMN_ITEM_feather) return 0;
+  return fmn_hero.facedir;
+}
+
 /* Input changed.
  */
  
