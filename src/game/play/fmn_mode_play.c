@@ -278,3 +278,11 @@ struct fmn_sprite *fmn_game_spawn_sprite(
 void fmn_game_create_soulballs(int16_t xmm,int16_t ymm) {
   fprintf(stderr,"TODO %s %d,%d\n",__func__,xmm,ymm);
 }
+
+/* Spells.
+ */
+ 
+uint8_t fmn_game_cast_spell(const uint8_t *v,uint8_t c) {
+  fprintf(stderr,"TODO %s %d\n",__func__,c);
+  return 0;
+}

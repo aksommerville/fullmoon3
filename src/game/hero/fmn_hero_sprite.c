@@ -21,7 +21,6 @@ void fmn_hero_sprite_update(struct fmn_sprite *sprite) {
  */
  
 static void fmn_hero_render_broom(struct fmn_image *fb,int16_t x,int16_t y) {
-  //TODO
   int16_t dstx=x-FMN_TILESIZE;
   int16_t dsty=y-FMN_TILESIZE-((FMN_TILESIZE*4)/8);
   if (fmn_hero.renderseq&1) {
@@ -34,7 +33,23 @@ static void fmn_hero_render_broom(struct fmn_image *fb,int16_t x,int16_t y) {
  */
  
 static void fmn_hero_render_wand(struct fmn_image *fb,int16_t x,int16_t y) {
-  //TODO
+
+  // Body, head, hat: Same as if we were facing south in the default pose.
+  fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x21,0);
+  int16_t dsty=y-((FMN_TILESIZE*5)>>3);
+  fmn_image_blit_tile(fb,x,dsty,&fmnr_image_hero,0x13,0);
+  int16_t dstx=x-FMN_TILESIZE;
+  dsty=y-((FMN_TILESIZE*10)>>3)-(FMN_TILESIZE>>1);
+  fmn_image_blit(fb,dstx-1,dsty,&fmnr_image_hero,0,0,FMN_TILESIZE<<1,FMN_TILESIZE,0);
+  
+  // Hand.
+  switch (fmn_hero.wanddir) {
+    case FMN_DIR_W: fmn_image_blit_tile(fb,x-(FMN_TILESIZE*7)/8,y,&fmnr_image_hero,0x4a,FMN_XFORM_XREV); break;
+    case FMN_DIR_E: fmn_image_blit_tile(fb,x+(FMN_TILESIZE*7)/8,y,&fmnr_image_hero,0x4a,0); break;
+    case FMN_DIR_N: fmn_image_blit_tile(fb,x,y-(FMN_TILESIZE*6)/8,&fmnr_image_hero,0x4b,FMN_XFORM_YREV); break;
+    case FMN_DIR_S: fmn_image_blit_tile(fb,x,y+(FMN_TILESIZE*4)/8,&fmnr_image_hero,0x4b,0); break;
+    default: fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x49,0);
+  }
 }
 
 /* Render while using violin.
@@ -112,7 +127,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
     switch (itemid) {
       case FMN_ITEM_broom: fmn_hero_render_carry_wide(fb,x,y,0x40); break;
       case FMN_ITEM_feather: fmn_hero_render_carry_small(fb,x,y,0x51); break;
-      case FMN_ITEM_wand:break;
+      case FMN_ITEM_wand: fmn_hero_render_carry_small(fb,x,y,0x53); break;
       case FMN_ITEM_violin:break;
       case FMN_ITEM_bell:break;
       case FMN_ITEM_chalk:break;

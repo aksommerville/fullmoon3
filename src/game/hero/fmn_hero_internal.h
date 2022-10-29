@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #define FMN_HERO_PUSH_DELAY 20
+#define FMN_SPELL_LIMIT 10 /* Must be at least one longer than the longest defined spell. */
 
 extern struct fmn_hero {
   int16_t x,y; // Center, mm.
@@ -35,6 +36,9 @@ extern struct fmn_hero {
   
   int8_t action; // itemid; <0 if none in progress. Does not necessarily match state's selected action.
   uint16_t actiontime; // frames since action started
+  uint8_t wanddir; // Last direction encoded with wand (ie current one to display).
+  uint8_t spellv[FMN_SPELL_LIMIT];
+  uint8_t spellc;
   
 } fmn_hero;
 

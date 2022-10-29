@@ -26,17 +26,19 @@
 - [ ] Save game
 - [ ] Spriteless treadle and stompbox
 - [ ] Map-based events
-- [ ] Weapons
-- - [ ] Broom
+- [ ] Weapons, first pass.
+- - [x] Broom
 - - [ ] Umbrella
-- - [ ] Wand
+- - [x] Wand
 - - [ ] Violin
 - - [ ] Chalk
 - - [ ] Pitcher
-- - [ ] Feather
+- - [x] Feather
 - - [ ] Matches
 - - [ ] Bell
 - - [ ] Corn
+- [ ] Spells
+- [ ] Spell repudiation
 - [ ] Change hat
 - [ ] Sound effects
 - [ ] Clean up music
@@ -47,3 +49,4 @@
 - - [ ] Raccoon
 - - [ ] Sea monster
 - - [ ] Fire nozzle
+- - [ ] Soulballs

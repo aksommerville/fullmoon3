@@ -25,4 +25,9 @@ struct fmn_sprite *fmn_game_spawn_sprite(
 
 void fmn_game_create_soulballs(int16_t xmm,int16_t ymm);
 
+/* (v) contains FMN_DIR_(W,E,N,S).
+ * Returns nonzero if this is a real spell and we performed it.
+ */
+uint8_t fmn_game_cast_spell(const uint8_t *v,uint8_t c);
+
 #endif
