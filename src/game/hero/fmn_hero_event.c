@@ -148,6 +148,20 @@ static void fmn_hero_violin_end() {
   fmn_hero.indy=0;
 }
 
+/* Bell.
+ */
+ 
+static void fmn_hero_bell_update() {
+  if (!(fmn_hero.actiontime%20)) {
+    fmn_platform_audio_note(0,0x60,0x70,100);
+  }
+}
+
+static void fmn_hero_bell_begin() {
+  fmn_hero_bell_update();
+  //TODO fire event
+}
+
 /* Update action.
  */
  
@@ -159,6 +173,7 @@ void fmn_hero_update_action() {
     case FMN_ITEM_feather: fmn_hero_feather_update(); break;
     case FMN_ITEM_wand: fmn_hero_wand_update(); break;
     case FMN_ITEM_violin: fmn_hero_violin_update(); break;
+    case FMN_ITEM_bell: fmn_hero_bell_update(); break;
     case FMN_ITEM_match: break;//TODO
     case FMN_ITEM_umbrella: break;//TODO
     case FMN_ITEM_compass: break;//TODO
@@ -178,7 +193,7 @@ static void fmn_hero_begin_action() {
     case FMN_ITEM_feather: break;
     case FMN_ITEM_wand: fmn_hero_wand_begin(); break;
     case FMN_ITEM_violin: fmn_hero_violin_begin(); break;
-    case FMN_ITEM_bell: break;//TODO
+    case FMN_ITEM_bell: fmn_hero_bell_begin(); break;
     case FMN_ITEM_chalk: break;//TODO
     case FMN_ITEM_pitcher: break;//TODO
     case FMN_ITEM_coin: break;//TODO

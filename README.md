@@ -35,7 +35,7 @@
 - - [ ] Pitcher
 - - [x] Feather
 - - [ ] Matches
-- - [ ] Bell
+- - [x] Bell
 - - [ ] Corn
 - [ ] Spells
 - [ ] Spell repudiation
