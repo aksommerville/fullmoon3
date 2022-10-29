@@ -9,6 +9,7 @@
 #include "game/map/fmn_map.h"
 #include "game/sprite/fmn_sprite.h"
 #include "game/state/fmn_state.h"
+#include "game/violin/fmn_violin.h"
 #include "game/fmn_data.h"
 #include <string.h>
 #include <stdio.h>
@@ -39,6 +40,7 @@ extern struct fmn_hero {
   uint8_t wanddir; // Last direction encoded with wand (ie current one to display).
   uint8_t spellv[FMN_SPELL_LIMIT];
   uint8_t spellc;
+  uint8_t violindir;
   
 } fmn_hero;
 

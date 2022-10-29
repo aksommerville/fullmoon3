@@ -5,6 +5,7 @@
 #include "game/hero/fmn_hero.h"
 #include "game/sprite/fmn_sprite.h"
 #include "game/state/fmn_state.h"
+#include "game/violin/fmn_violin.h"
 #include "game/fmn_data.h"
 #include "fmn_play.h"
 #include <stdio.h>
@@ -82,6 +83,9 @@ void fmn_game_reset() {
  
 uint8_t fmn_game_navigate(const struct fmn_map_resource *map,uint8_t col,uint8_t row,uint8_t transition) {
   if (!map) return 0;
+  
+  // Clear up some state just in case.
+  fmn_violin_end();
   
   struct fmn_game_cb_mapcmd_load_context ctx={0};
   int16_t herox,heroy;
@@ -235,7 +239,7 @@ static void fmn_game_render_transition(struct fmn_image *fb) {
  */
  
 static void fmn_game_render_synthetic_overlay(struct fmn_image *fb) {
-  //TODO overlay
+  fmn_violin_render(fb);
 }
 
 /* Render, TOC.
@@ -282,7 +286,28 @@ void fmn_game_create_soulballs(int16_t xmm,int16_t ymm) {
 /* Spells.
  */
  
+//XXX
+static void fmn_game_log_spell(const char *fnname,const uint8_t *v,uint8_t c) {
+  fprintf(stderr,"%s:",fnname);
+  for (;c-->0;v++) switch (*v) {
+    case 0: fprintf(stderr," ."); break;
+    case FMN_DIR_N: fprintf(stderr," N"); break;
+    case FMN_DIR_S: fprintf(stderr," S"); break;
+    case FMN_DIR_W: fprintf(stderr," W"); break;
+    case FMN_DIR_E: fprintf(stderr," E"); break;
+    default: fprintf(stderr," ?"); break;
+  }
+  fprintf(stderr,"\n");
+}
+ 
 uint8_t fmn_game_cast_spell(const uint8_t *v,uint8_t c) {
-  fprintf(stderr,"TODO %s %d\n",__func__,c);
+  fmn_game_log_spell(__func__,v,c);
+  return 0;
+}
+
+uint8_t fmn_game_cast_song(const uint8_t *v,uint8_t c) {
+  while (c&&!v[c-1]) c--;
+  while (c&&!v[0]) { c--; v++; }
+  fmn_game_log_spell(__func__,v,c);
   return 0;
 }

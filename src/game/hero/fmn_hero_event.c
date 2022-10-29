@@ -64,7 +64,7 @@ static void fmn_hero_wand_begin() {
   fmn_hero.walkdx=0;
   fmn_hero.walkdy=0;
   fmn_hero.wanddir=0;
-  //TODO Clear encoder state.
+  fmn_hero.spellc=0;
 }
 
 static void fmn_hero_wand_update() {
@@ -110,6 +110,44 @@ static void fmn_hero_wand_end() {
   fmn_hero.indy=0;
 }
 
+/* Violin.
+ */
+ 
+static void fmn_hero_violin_begin() {
+  fmn_hero.walkdx=0;
+  fmn_hero.walkdy=0;
+  fmn_hero.violindir=0;
+  fmn_violin_begin();
+}
+
+static void fmn_hero_violin_update() {
+
+  if (fmn_hero.indx&&fmn_hero.indy) {
+    fmn_violin_update(fmn_hero.violindir);
+    return;
+  }
+
+  // Was going to do diagonals but that's really hard to manage finger-wise.
+  uint8_t violindir=0;
+       if (fmn_hero.indx<0) violindir=FMN_DIR_W;
+  else if (fmn_hero.indx>0) violindir=FMN_DIR_E;
+  else if (fmn_hero.indy<0) violindir=FMN_DIR_N;
+  else if (fmn_hero.indy>0) violindir=FMN_DIR_S;
+  
+  fmn_violin_update(violindir);
+  fmn_hero.violindir=violindir;
+}
+
+static void fmn_hero_violin_end() {
+  fmn_violin_end();
+  
+  // We always face south during encode. I think it's agreeable to stay south after.
+  fmn_hero.facedir=FMN_DIR_S;
+  // Force reconsideration of dpad (ensure if we start walking, we face the right direction).
+  fmn_hero.indx=0;
+  fmn_hero.indy=0;
+}
+
 /* Update action.
  */
  
@@ -120,7 +158,7 @@ void fmn_hero_update_action() {
     case FMN_ITEM_broom: fmn_hero_broom_update(); break;
     case FMN_ITEM_feather: fmn_hero_feather_update(); break;
     case FMN_ITEM_wand: fmn_hero_wand_update(); break;
-    case FMN_ITEM_violin: break;//TODO
+    case FMN_ITEM_violin: fmn_hero_violin_update(); break;
     case FMN_ITEM_match: break;//TODO
     case FMN_ITEM_umbrella: break;//TODO
     case FMN_ITEM_compass: break;//TODO
@@ -139,7 +177,7 @@ static void fmn_hero_begin_action() {
     case FMN_ITEM_broom: break;
     case FMN_ITEM_feather: break;
     case FMN_ITEM_wand: fmn_hero_wand_begin(); break;
-    case FMN_ITEM_violin: break;//TODO
+    case FMN_ITEM_violin: fmn_hero_violin_begin(); break;
     case FMN_ITEM_bell: break;//TODO
     case FMN_ITEM_chalk: break;//TODO
     case FMN_ITEM_pitcher: break;//TODO
@@ -160,9 +198,9 @@ static void fmn_hero_begin_action() {
  
 static void fmn_hero_end_action() {
   switch (fmn_hero.action) {
-    case FMN_ITEM_broom: fmn_hero_broom_end(); return;
+    case FMN_ITEM_broom: fmn_hero_broom_end(); return; // sic return; might retain (action)
     case FMN_ITEM_wand: fmn_hero_wand_end(); break;
-    case FMN_ITEM_violin: break;//TODO resume music
+    case FMN_ITEM_violin: fmn_hero_violin_end(); break;
     case FMN_ITEM_match: break;//TODO turn lights back off
   }
   fmn_hero.action=-1;

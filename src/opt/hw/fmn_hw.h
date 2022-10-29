@@ -207,6 +207,7 @@ struct fmn_hw_synth_type {
   int (*configure)(struct fmn_hw_synth *synth,const void *v,int c);
   int (*serial_midi)(struct fmn_hw_synth *synth,const void *v,int c);
   int (*play_song)(struct fmn_hw_synth *synth,const void *v,int c);
+  int (*pause_song)(struct fmn_hw_synth *synth,uint8_t pause);
   void (*note)(struct fmn_hw_synth *synth,uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms);
   void (*silence)(struct fmn_hw_synth *synth);
   void (*release_all)(struct fmn_hw_synth *synth);
@@ -230,6 +231,7 @@ int fmn_hw_synth_serial_midi(struct fmn_hw_synth *synth,const void *v,int c);
 /* Caller must ensure that (v) remain valid and constant as long as it's playing.
  */
 int fmn_hw_synth_play_song(struct fmn_hw_synth *synth,const void *v,int c);
+int fmn_hw_synth_pause_song(struct fmn_hw_synth *synth,uint8_t pause);
 
 void fmn_hw_synth_note(struct fmn_hw_synth *synth,uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms);
 void fmn_hw_synth_silence(struct fmn_hw_synth *synth);

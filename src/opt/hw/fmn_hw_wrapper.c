@@ -143,6 +143,11 @@ int fmn_hw_synth_play_song(struct fmn_hw_synth *synth,const void *v,int c) {
   return synth->type->play_song(synth,v,c);
 }
 
+int fmn_hw_synth_pause_song(struct fmn_hw_synth *synth,uint8_t pause) {
+  if (!synth->type->pause_song) return -1;
+  return synth->type->pause_song(synth,pause);
+}
+
 void fmn_hw_synth_note(struct fmn_hw_synth *synth,uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms) {
   if (!synth->type->note) return;
   return synth->type->note(synth,programid,noteid,velocity,duration_ms);

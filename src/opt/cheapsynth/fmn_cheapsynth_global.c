@@ -113,6 +113,11 @@ void fmn_cheapsynth_play_song(const void *v,uint16_t c) {
   fmn_cheapsynth_reset_channels();
 }
 
+void fmn_cheapsynth_pause_song(uint8_t pause) {
+  fmn_cheapsynth.songpause=pause;
+  if (pause) fmn_cheapsynth_release_all();
+}
+
 /* Get available voice.
  */
  

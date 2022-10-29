@@ -6,8 +6,9 @@
 int32_t fmn_cheapsynth_update_song() {
   while (fmn_cheapsynth.song) {
   
-    // Got a delay? We're done here.
+    // Got a delay or pause? We're done here.
     if (fmn_cheapsynth.songdelay) return fmn_cheapsynth.songdelay;
+    if (fmn_cheapsynth.songpause) return INT32_MAX;
     
     // End of song? Loop and return 1, so we can't loop forever.
     if (

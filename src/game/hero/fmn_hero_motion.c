@@ -117,6 +117,7 @@ void fmn_hero_update_walk() {
   // Get out if motion is suppressed due to an action.
   switch (fmn_hero.action) {
     case FMN_ITEM_wand:
+    case FMN_ITEM_violin:
       return;
   }
 

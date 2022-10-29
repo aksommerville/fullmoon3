@@ -56,7 +56,26 @@ static void fmn_hero_render_wand(struct fmn_image *fb,int16_t x,int16_t y) {
  */
  
 static void fmn_hero_render_violin(struct fmn_image *fb,int16_t x,int16_t y) {
-  //TODO
+
+  // Body, head, hat: Same as if we were facing south in the default pose.
+  fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x21,0);
+  int16_t dsty=y-((FMN_TILESIZE*5)>>3);
+  fmn_image_blit_tile(fb,x,dsty,&fmnr_image_hero,0x13,0);
+  int16_t dstx=x-FMN_TILESIZE;
+  dsty=y-((FMN_TILESIZE*10)>>3)-(FMN_TILESIZE>>1);
+  fmn_image_blit(fb,dstx-1,dsty,&fmnr_image_hero,0,0,FMN_TILESIZE<<1,FMN_TILESIZE,0);
+  
+  fmn_image_blit_tile(fb,x+(FMN_TILESIZE*5)/8,y-(FMN_TILESIZE*2)/8,&fmnr_image_hero,0x59,0);
+  
+  if (fmn_hero.violindir) {
+    uint8_t frame=fmn_hero.animframe;
+    if (frame==3) frame=1;
+    dstx=x+(FMN_TILESIZE*4)/8-frame;
+    dsty=y-(FMN_TILESIZE*5)/8+frame;
+    fmn_image_blit_tile(fb,dstx,dsty,&fmnr_image_hero,0x5a,0);
+  } else {
+    fmn_image_blit_tile(fb,x-(FMN_TILESIZE*5)/8,y-(FMN_TILESIZE*1)/8,&fmnr_image_hero,0x69,0);
+  }
 }
 
 /* Feather.
@@ -128,7 +147,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
       case FMN_ITEM_broom: fmn_hero_render_carry_wide(fb,x,y,0x40); break;
       case FMN_ITEM_feather: fmn_hero_render_carry_small(fb,x,y,0x51); break;
       case FMN_ITEM_wand: fmn_hero_render_carry_small(fb,x,y,0x53); break;
-      case FMN_ITEM_violin:break;
+      case FMN_ITEM_violin: fmn_hero_render_carry_small(fb,x,y,0x55); break;
       case FMN_ITEM_bell:break;
       case FMN_ITEM_chalk:break;
       case FMN_ITEM_pitcher:break;

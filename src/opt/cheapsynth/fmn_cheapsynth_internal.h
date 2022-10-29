@@ -47,6 +47,7 @@ extern struct fmn_cheapsynth {
   uint8_t songstartp;
   uint16_t songloopp;
   int32_t songdelay; // frames
+  uint8_t songpause;
   
   struct fmn_cheapsynth_channel {
     uint8_t mode;

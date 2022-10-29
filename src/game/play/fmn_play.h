@@ -27,7 +27,10 @@ void fmn_game_create_soulballs(int16_t xmm,int16_t ymm);
 
 /* (v) contains FMN_DIR_(W,E,N,S).
  * Returns nonzero if this is a real spell and we performed it.
+ * btw a song is just a different set of spells; they work exactly the same way.
+ * Songs may contain zeroes. Leading and trailing zeroes are ignored.
  */
 uint8_t fmn_game_cast_spell(const uint8_t *v,uint8_t c);
+uint8_t fmn_game_cast_song(const uint8_t *v,uint8_t c);
 
 #endif

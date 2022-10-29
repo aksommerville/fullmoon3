@@ -61,6 +61,11 @@ static int _cheapsynth_play_song(struct fmn_hw_synth *synth,const void *v,int c)
   fmn_cheapsynth_play_song(v,c);
   return 0;
 }
+
+static int _cheapsynth_pause_song(struct fmn_hw_synth *synth,uint8_t pause) {
+  fmn_cheapsynth_pause_song(pause);
+  return 0;
+}
  
 static void _cheapsynth_note(struct fmn_hw_synth *synth,uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms) {
   fmn_cheapsynth_note(programid,noteid,velocity,duration_ms);
@@ -86,6 +91,7 @@ const struct fmn_hw_synth_type fmn_hw_synth_type_cheapsynth={
   .configure=_cheapsynth_configure,
   .serial_midi=_cheapsynth_serial_midi,
   .play_song=_cheapsynth_play_song,
+  .pause_song=_cheapsynth_pause_song,
   .note=_cheapsynth_note,
   .silence=_cheapsynth_silence,
   .release_all=_cheapsynth_release_all,

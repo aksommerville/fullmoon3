@@ -55,8 +55,10 @@ void fmn_platform_audio_configure(const void *v,uint16_t c);
 /* Begin playing a song, if it isn't already.
  * Play (0,0) for none.
  * *** We will read off (v) directly, caller must arrange to keep it alive. ***
+ * Pause stops playback while nonzero. Intended for the hero's violin.
  */
 void fmn_platform_audio_play_song(const void *v,uint16_t c);
+void fmn_platform_audio_pause_song(uint8_t pause);
 
 /* Play a fire-and-forget note with no channel context.
  * This is probably what you want, for sound effects initiated by the game.

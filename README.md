@@ -30,7 +30,7 @@
 - - [x] Broom
 - - [ ] Umbrella
 - - [x] Wand
-- - [ ] Violin
+- - [x] Violin
 - - [ ] Chalk
 - - [ ] Pitcher
 - - [x] Feather

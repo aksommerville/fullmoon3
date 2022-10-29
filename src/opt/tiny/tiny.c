@@ -574,6 +574,9 @@ void fmn_platform_terminate(uint8_t status) {
   void fmn_platform_audio_play_song(const void *v,uint16_t c) {
     fmn_cheapsynth_play_song(v,c);
   }
+  void fmn_platform_audio_pause_song(uint8_t pause) {
+    fmn_cheapsynth_pause_song(pause);
+  }
   void fmn_platform_audio_note(uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms) {
     fmn_cheapsynth_note(programid,noteid,velocity,duration_ms);
   }
@@ -586,6 +589,7 @@ void fmn_platform_terminate(uint8_t status) {
 #else
   void fmn_platform_audio_configure(const void *v,uint16_t c) {}
   void fmn_platform_audio_play_song(const void *v,uint16_t c) {}
+  void fmn_platform_audio_pause_song(uint8_t pause) {}
   void fmn_platform_audio_note(uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms) {}
   void fmn_platform_audio_silence() {}
   void fmn_platform_audio_release_all() {}

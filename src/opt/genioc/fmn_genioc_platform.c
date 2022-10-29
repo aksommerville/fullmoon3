@@ -59,6 +59,14 @@ void fmn_platform_audio_play_song(const void *v,uint16_t c) {
   if (fmn_genioc.audio_unlock) fmn_genioc.audio_unlock(fmn_genioc.audio);
 }
 
+void fmn_platform_audio_pause_song(uint8_t pause) {
+  struct fmn_hw_synth *synth=fmn_hw_mgr_get_synth(fmn_genioc.mgr);
+  if (!synth) return;
+  if (fmn_genioc.audio_lock) fmn_genioc.audio_lock(fmn_genioc.audio);
+  fmn_hw_synth_pause_song(synth,pause);
+  if (fmn_genioc.audio_unlock) fmn_genioc.audio_unlock(fmn_genioc.audio);
+}
+
 void fmn_platform_audio_note(uint8_t programid,uint8_t noteid,uint8_t velocity,uint16_t duration_ms) {
   struct fmn_hw_synth *synth=fmn_hw_mgr_get_synth(fmn_genioc.mgr);
   if (!synth) return;
