@@ -44,7 +44,7 @@ static const struct fmn_hw_video_type *fmn_hw_video_typev[]={
 #if FMN_USE_mswm
   &fmn_hw_video_type_mswm,
 #endif
-#if FMN_USE_macwm
+#if FMN_USE_macos
   &fmn_hw_video_type_macwm,
 #endif
 #if FMN_USE_ttyvideo
@@ -63,8 +63,8 @@ static const struct fmn_hw_audio_type *fmn_hw_audio_typev[]={
 #if FMN_USE_msaudio
   &fmn_hw_audio_type_msaudio,
 #endif
-#if FMN_USE_macaudio
-  &fmn_hw_audio_type_macaudio,
+#if FMN_USE_macos
+//  &fmn_hw_audio_type_macaudio,//TODO
 #endif
   &fmn_hw_audio_type_nullaudio,
 };
@@ -73,8 +73,8 @@ static const struct fmn_hw_input_type *fmn_hw_input_typev[]={
 #if FMN_USE_evdev
   &fmn_hw_input_type_evdev,
 #endif
-#if FMN_USE_machid
-  &fmn_hw_input_type_machid,
+#if FMN_USE_macos
+  &fmn_hw_input_type_machid,//TODO app goes unresponsive sometimes when this is enabled
 #endif
 #if FMN_USE_mshid
   &fmn_hw_input_type_mshid,

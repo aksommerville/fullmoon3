@@ -74,7 +74,10 @@ int fmn_hw_mgr_update(struct fmn_hw_mgr *mgr) {
   int i=mgr->inputc;
   struct fmn_hw_input **input=mgr->inputv;
   for (;i-->0;input++) {
-    if (fmn_hw_input_update(*input)<0) return -1;
+    if (fmn_hw_input_update(*input)<0) {
+      //fprintf(stderr,"fmn_hw_input_update failed\n");
+      return -1;
+    }
   }
   return 0;
 }

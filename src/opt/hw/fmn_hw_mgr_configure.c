@@ -364,6 +364,7 @@ static int fmn_hw_mgr_init_input_type(struct fmn_hw_mgr *mgr,const struct fmn_hw
   }
   if (!(mgr->inputv[mgr->inputc]=fmn_hw_input_new(type,&mgr->delegate))) return 0;
   mgr->inputc++;
+  fprintf(stderr,"Using input driver '%s'\n",type->name);
   return 0;
 }
 

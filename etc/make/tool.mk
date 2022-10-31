@@ -6,7 +6,7 @@ tool_OUTDIR:=out/tool
 tool_OPT_ENABLE:=fs serial http
 
 tool_CCDEF:=$(addprefix -DFMN_USE_,$(tool_OPT_ENABLE))
-tool_CCWARN:=-Werror -Wimplicit
+tool_CCWARN:=-Werror -Wimplicit -Wno-parentheses -Wno-pointer-sign -Wno-comment
 tool_CCINC:=-Isrc -I$(tool_MIDDIR)
 tool_CC:=gcc -c -MMD -O3 $(tool_CCINC) $(tool_CCWARN) $(tool_CCDEF)
 tool_AS:=gcc -xassembler-with-cpp -c -MMD -O3 $(tool_CCINC) $(tool_CCWARN) $(tool_CCDEF)

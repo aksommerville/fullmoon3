@@ -40,6 +40,8 @@ void fmn_hw_video_end(struct fmn_hw_video *video,struct fmn_image *fb) {
 }
 
 int fmn_hw_video_set_fullscreen(struct fmn_hw_video *video,int fullscreen) {
+  if (!video) return 0;
+  if (fullscreen<0) fullscreen=video->fullscreen?0:1;
   if (fullscreen) {
     if (video->fullscreen) return 1;
     if (video->type->set_fullscreen) video->type->set_fullscreen(video,1);

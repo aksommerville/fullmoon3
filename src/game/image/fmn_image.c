@@ -6,6 +6,8 @@
   #define BIG_ENDIAN 4321
   #define LITTLE_ENDIAN 1234
   #define BYTE_ORDER LITTLE_ENDIAN
+#elif FMN_USE_macos
+  #include <machine/endian.h>
 #else
   #include <endian.h>
 #endif
