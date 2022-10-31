@@ -44,6 +44,7 @@ static int fmn_machid_cb_disconnect(int devid) {
 }
 
 static int fmn_machid_cb_button(int devid,int btnid,int value) {
+  //fprintf(stderr,"%s %d.%d=%d\n",__func__,devid,btnid,value);
   struct fmn_hw_input *driver=fmn_machid_instance;
   if (!driver) return 0;
   if (driver->delegate->button) driver->delegate->button(driver,devid,btnid,value);
@@ -90,13 +91,13 @@ static const char *_machid_device_get_ids(int *vid,int *pid,struct fmn_hw_input 
 static int _machid_device_iterate(
   struct fmn_hw_input *driver,
   int devid,
-  int (*cb)(struct fmn_hw_input *driver,int devid,int btnid,int hidusage,int value,int lo,int hi,void *userdata),
+  int (*cb)(struct fmn_hw_input *driver,int devid,int btnid,int hidusage,int lo,int hi,int value,void *userdata),
   void *userdata
 ) {
   int index=0,btnid,usage,lo,hi,value,err;
   for (;;index++) {
     if (fmn_machid_dev_get_button_info(&btnid,&usage,&lo,&hi,&value,devid,index)<0) break;
-    if (err=cb(driver,devid,btnid,usage,value,lo,hi,userdata)) return err;
+    if (err=cb(driver,devid,btnid,usage,lo,hi,value,userdata)) return err;
   }
   return 0;
 }

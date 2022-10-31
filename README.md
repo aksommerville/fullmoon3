@@ -50,3 +50,9 @@
 - - [ ] Sea monster
 - - [ ] Fire nozzle
 - - [ ] Soulballs
+
+## Defects
+
+- [ ] fmn_game_cast_song() is getting re-called on map changes, with the most recent song.
+- [ ] Playing violin, prevent new notes from appearing at the left, sometimes they do briefly.
+- [ ] Ride broom and turn during neighbor screen transition, image gets doubled.

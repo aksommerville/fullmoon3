@@ -107,27 +107,22 @@ void fmn_macioc_cb_mwheel(struct fmn_hw_video *video,int dx,int dy) {
 /* Joystick events.
  */
 
-#if FMN_USE_inmap
-
-static int fmn_macioc_cb_devcap(struct input_driver *driver,int devid,int btnid,int hidusage,int value,int lo,int hi,void *userdata) {
-  return fmn_inmap_add_button(fmn_macioc.inmap,devid,btnid,hidusage,value,lo,hi);
-}
+#if FMN_USE_inmgr
 
 void fmn_macioc_cb_connect(struct fmn_hw_input *input,int devid) {
-  int vid,pid;
-  const char *name=input_device_get_ids(&vid,&pid,driver,devid);
-  if (fmn_inmap_connect(fmn_macioc.inmap,devid)<0) return;
-  if (fmn_inmap_set_ids(fmn_macioc.inmap,devid,vid,pid,name)<0) return;
-  if (input_device_iterate(driver,devid,fmn_macioc_cb_devcap,0)<0) return;
-  if (fmn_inmap_device_ready(fmn_macioc.inmap,devid)<0) return;
+  fmn_inmgr_connect(fmn_macioc.inmgr,input,devid);
 }
 
 void fmn_macioc_cb_disconnect(struct fmn_hw_input *input,int devid) {
-  fmn_inmap_disconnect(fmn_macioc.inmap,devid);
+  fmn_inmgr_disconnect(fmn_macioc.inmgr,devid);
 }
 
 void fmn_macioc_cb_event(struct fmn_hw_input *input,int devid,int btnid,int value) {
-  fmn_inmap_event(fmn_macioc.inmap,devid,btnid,value);
+  fmn_inmgr_button(fmn_macioc.inmgr,devid,btnid,value);
+}
+
+void fmn_macioc_cb_premapped_event(struct fmn_hw_input *input,int devid,uint8_t btnid,int value) {
+  fmn_inmgr_premapped(fmn_macioc.inmgr,devid,btnid,value);
 }
 
 #else
@@ -138,10 +133,21 @@ void fmn_macioc_cb_connect(struct fmn_hw_input *input,int devid) {}
 void fmn_macioc_cb_disconnect(struct fmn_hw_input *input,int devid) {}
 void fmn_macioc_cb_event(struct fmn_hw_input *input,int devid,int btnid,int value) {}
 
-#endif
-
 void fmn_macioc_cb_premapped_event(struct fmn_hw_input *input,int devid,uint8_t btnid,int value) {
-  //fprintf(stderr,"%s 0x%04x=%d\n",__func__,btnid,value);
   if (value) fmn_macioc.input|=btnid;
   else fmn_macioc.input&=~btnid;
+}
+
+#endif
+
+void fmn_macioc_cb_state(struct fmn_inmgr *inmgr,uint8_t btnid,int value,uint8_t state) {
+  if (value) fmn_macioc.input|=btnid;
+  else fmn_macioc.input&=~btnid;
+}
+
+void fmn_macioc_cb_action(struct fmn_inmgr *inmgr,int btnid) {
+  switch (btnid) {
+    case FMN_INMGR_ACTION_QUIT: fmn_macioc_abort(0); break;
+    case FMN_INMGR_ACTION_FULLSCREEN: fmn_macioc_toggle_fullscreen(); break;
+  }
 }

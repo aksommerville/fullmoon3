@@ -7,8 +7,8 @@
 #include "game/image/fmn_image.h"
 #include <string.h>
 
-#if FMN_USE_inmap
-  #include "opt/inmap/fmn_inmap.h"
+#if FMN_USE_inmgr
+  #include "opt/inmgr/fmn_inmgr.h"
 #endif
 
 #ifdef __OBJC__
@@ -36,8 +36,8 @@ extern struct fmn_macioc {
   int64_t frametime;
   int64_t nexttime;
 
-  #if FMN_USE_inmap
-    struct fmn_inmap *inmap;
+  #if FMN_USE_inmgr
+    struct fmn_inmgr *inmgr;
   #endif
 } fmn_macioc;
 
@@ -58,6 +58,9 @@ void fmn_macioc_cb_connect(struct fmn_hw_input *driver,int devid);
 void fmn_macioc_cb_disconnect(struct fmn_hw_input *driver,int devid);
 void fmn_macioc_cb_event(struct fmn_hw_input *driver,int devid,int btnid,int value);
 void fmn_macioc_cb_premapped_event(struct fmn_hw_input *driver,int devid,uint8_t btnid,int value);
+
+void fmn_macioc_cb_state(struct fmn_inmgr *inmgr,uint8_t btnid,int value,uint8_t state);
+void fmn_macioc_cb_action(struct fmn_inmgr *inmgr,int btnid);
 
 double fmn_macioc_now_s();
 double fmn_macioc_now_cpu_s();

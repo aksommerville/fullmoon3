@@ -90,8 +90,12 @@ static int fmn_macioc_configure(int argc,char **argv) {
   fmn_macioc.argc=argc;
   fmn_macioc.argv=argv;
 
-  #if FMN_USE_inmap
-    fmn_macioc.inmap=fmn_inmap_new();
+  #if FMN_USE_inmgr
+    struct fmn_inmgr_delegate delegate={
+      .state=fmn_macioc_cb_state,
+      .action=fmn_macioc_cb_action,
+    };
+    fmn_macioc.inmgr=fmn_inmgr_new(&delegate);
     //TODO config file
   #endif
 

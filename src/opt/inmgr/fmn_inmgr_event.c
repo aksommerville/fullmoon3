@@ -54,6 +54,21 @@ static int fmn_inmgr_device_add_double(struct fmn_inmgr_device *device,int srcbt
   return 0;
 }
 
+// HORZ or VERT, whichever has fewer mappings so far.
+static int fmn_inmgr_device_add_lonelier_axis(struct fmn_inmgr_device *device,int srcbtnid,int fulllo,int fullhi) {
+  int horzc=0,vertc=0;
+  const struct fmn_inmgr_device_button *button=device->buttonv;
+  int i=device->buttonc;
+  for (;i-->0;button++) {
+    if (button->dstbtnid&(FMN_BUTTON_LEFT|FMN_BUTTON_RIGHT)) horzc++;
+    if (button->dstbtnid&(FMN_BUTTON_UP|FMN_BUTTON_DOWN)) vertc++;
+  }
+  int dstbtnid;
+  if (horzc>vertc) dstbtnid=FMN_BUTTON_UP|FMN_BUTTON_DOWN;
+  else dstbtnid=FMN_BUTTON_LEFT|FMN_BUTTON_RIGHT; // ties break horz
+  return fmn_inmgr_device_add_double(device,srcbtnid,dstbtnid,fulllo,fullhi);
+}
+
 //TODO hats as dpad
 
 /* Configure for one button in device.
@@ -106,6 +121,7 @@ static int fmn_inmgr_device_configure_hw_button(
     
     HORZ(0x00010030)
     VERT(0x00010031)
+    HORZ(0x00010032)
     HORZ(0x00010033)
     VERT(0x00010035)
     
@@ -117,6 +133,17 @@ static int fmn_inmgr_device_configure_hw_button(
     if (usage&1) return fmn_inmgr_device_add_single(ctx->device,btnid,FMN_BUTTON_A,lo,hi);
     return fmn_inmgr_device_add_single(ctx->device,btnid,FMN_BUTTON_B,lo,hi);
   }
+
+  if (usage==0x00010039) {
+    // "Hat Switch". But my 8bitDo Pro 2 reports its dpad as two of these in -1..1. The heck, 8bitDo?
+    if ((lo==-1)&&(hi==1)) {
+      return fmn_inmgr_device_add_lonelier_axis(ctx->device,btnid,lo,hi);
+    } else if (lo==hi-7) {
+      //TODO 8-way hat as dpad. Be sure to find one before we start testing. (I think the Zelda branded one on MacOS?)
+      fprintf(stderr,"TODO hat as dpad %s:%d\n",__FILE__,__LINE__);
+    }
+  }
+  
   return 0;
 }
 
