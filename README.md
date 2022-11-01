@@ -15,7 +15,7 @@
 - - [ ] Web
 - - [ ] Linux DRM
 - - [ ] Windows
-- - [ ] MacOS
+- - [x] MacOS
 - - [ ] Thumby
 - - [ ] Picosystem
 - - [ ] Mac 68k
@@ -54,5 +54,6 @@
 ## Defects
 
 - [ ] fmn_game_cast_song() is getting re-called on map changes, with the most recent song.
+- [ ] Sometimes a buzz when changing screens. Related to the cast_song thing?
 - [ ] Playing violin, prevent new notes from appearing at the left, sometimes they do briefly.
 - [ ] Ride broom and turn during neighbor screen transition, image gets doubled.

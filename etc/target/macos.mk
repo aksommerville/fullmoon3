@@ -12,7 +12,7 @@ macos_CC:=gcc -c -MMD -O3 $(macos_CCINC) $(macos_CCWARN) $(macos_CCDEF)
 macos_OBJC:=gcc -c -MMD -O3 -xobjective-c $(macos_CCINC) $(macos_CCWARN) $(macos_CCDEF)
 macos_AS:=gcc -xassembler-with-cpp -c -MMD -O3 $(macos_CCINC) $(macos_CCWARN) $(macos_CCDEF)
 macos_LD:=gcc
-macos_LDPOST:=-lm -lz -framework Cocoa -framework IOKit -framework Quartz
+macos_LDPOST:=-lm -lz -framework Cocoa -framework IOKit -framework Quartz -framework AudioUnit
 
 macos_SRCFILES:= \
   $(filter-out src/opt/% src/tool/% src/test/%,$(FMN_SRCFILES)) \

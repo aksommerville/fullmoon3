@@ -64,7 +64,7 @@ static const struct fmn_hw_audio_type *fmn_hw_audio_typev[]={
   &fmn_hw_audio_type_msaudio,
 #endif
 #if FMN_USE_macos
-//  &fmn_hw_audio_type_macaudio,//TODO
+  &fmn_hw_audio_type_macaudio,
 #endif
   &fmn_hw_audio_type_nullaudio,
 };
@@ -74,7 +74,7 @@ static const struct fmn_hw_input_type *fmn_hw_input_typev[]={
   &fmn_hw_input_type_evdev,
 #endif
 #if FMN_USE_macos
-  &fmn_hw_input_type_machid,//TODO app goes unresponsive sometimes when this is enabled
+  &fmn_hw_input_type_machid,
 #endif
 #if FMN_USE_mshid
   &fmn_hw_input_type_mshid,
