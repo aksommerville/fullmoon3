@@ -155,6 +155,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
   if (fmn_hero.action>=0) switch (fmn_hero.action) {
     case FMN_ITEM_feather: fmn_hero_render_feather_active(fb,x,y); break;
     case FMN_ITEM_bell: fmn_hero_render_bell_active(fb,x,y); break;
+    case FMN_ITEM_pitcher: fmn_hero_render_carry_small(fb,x,y,0x3f); break;
   } else {
     uint8_t itemid=fmn_state_get_selected_item_if_possessed();
     switch (itemid) {
@@ -164,7 +165,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
       case FMN_ITEM_violin: fmn_hero_render_carry_small(fb,x,y,0x55); break;
       case FMN_ITEM_bell: fmn_hero_render_carry_small(fb,x,y,0x5b); break;
       case FMN_ITEM_chalk: fmn_hero_render_carry_small(fb,x,y,0x5e); break;
-      case FMN_ITEM_pitcher:break;
+      case FMN_ITEM_pitcher: fmn_hero_render_carry_small(fb,x,y,0x5f); break;
       case FMN_ITEM_coin:break;
       case FMN_ITEM_match:break;
       case FMN_ITEM_corn:break;

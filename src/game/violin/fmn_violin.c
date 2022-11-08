@@ -40,6 +40,7 @@ void fmn_violin_begin() {
  */
  
 void fmn_violin_end() {
+  if (!fmn_violin_active) return;
   fmn_violin_active=0;
   fmn_violin_update(0);
   fmn_platform_audio_pause_song(0);
@@ -50,6 +51,7 @@ void fmn_violin_end() {
   memcpy(song,fmn_violin_song+tailc,sizeof(fmn_violin_song)-tailc);
   memcpy(song+sizeof(fmn_violin_song)-tailc,fmn_violin_song,tailc);
   fmn_game_cast_song(song,FMN_VIOLIN_SONG_LENGTH);
+  memset(fmn_violin_song,0,sizeof(fmn_violin_song));
 }
 
 /* Notes.

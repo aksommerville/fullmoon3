@@ -193,6 +193,85 @@ static void fmn_hero_chalk_begin() {
   fmn_hero.action=-1;
 }
 
+/* Pitcher.
+ */
+ 
+static uint8_t fmn_hero_find_pitcher_content(int16_t x,int16_t y) {
+  
+  // Look for milkable sprites.
+  const int16_t r=FMN_MM_PER_TILE>>1;
+  int16_t left=x-r,right=x+r,top=y-r,bottom=y+r;
+  struct fmn_sprite *cow=fmn_spritev;
+  uint8_t i=fmn_spritec;
+  for (;i-->0;cow++) {
+    if (cow->x<left) continue;
+    if (cow->x>right) continue;
+    if (cow->y<top) continue;
+    if (cow->y>bottom) continue;
+    if (cow->type==&fmn_sprite_type_beehive) return FMN_PITCHER_CONTENT_honey;
+    if (cow->type==&fmn_sprite_type_cow) return FMN_PITCHER_CONTENT_milk;
+  }
+  
+  // Look for map cells.
+  // We don't have anywhere to record per-tile which ones are milkable.
+  // Hard-coding them here. Probably a bad idea.
+  if ((x>=0)&&(y>=0)&&(x<FMN_COLC*FMN_MM_PER_TILE)&&(y<FMN_ROWC*FMN_MM_PER_TILE)) {
+    uint8_t col=x/FMN_MM_PER_TILE;
+    uint8_t row=y/FMN_MM_PER_TILE;
+    uint8_t tileid=fmn_map.v[row*FMN_COLC+col];
+    if (fmn_map.tilesheet==&fmnr_image_outdoors) {
+      if ((tileid>=0x15)&&(tileid<=0x19)) return FMN_PITCHER_CONTENT_water;
+      if ((tileid>=0x25)&&(tileid<=0x29)) return FMN_PITCHER_CONTENT_water;
+      if ((tileid>=0x35)&&(tileid<=0x39)) return FMN_PITCHER_CONTENT_water;
+      if ((tileid>=0x1a)&&(tileid<=0x1e)) return FMN_PITCHER_CONTENT_sap;
+      if ((tileid>=0x2a)&&(tileid<=0x2e)) return FMN_PITCHER_CONTENT_sap;
+      if ((tileid>=0x3a)&&(tileid<=0x3e)) return FMN_PITCHER_CONTENT_sap;
+      if ((tileid>=0x89)&&(tileid<=0x8b)) return FMN_PITCHER_CONTENT_sap;
+      if (tileid==0x99) return FMN_PITCHER_CONTENT_sap;
+      if (tileid==0x9b) return FMN_PITCHER_CONTENT_sap;
+    }
+  }
+  
+  return FMN_PITCHER_CONTENT_none;
+}
+
+static void fmn_hero_log_pitcher(const char *verb,uint8_t content) { //XXX
+  const char *contentname="UNKNOWN";
+  switch (content) {
+    #define _(tag) case FMN_PITCHER_CONTENT_##tag: contentname=#tag; break;
+    FMN_FOR_EACH_PITCHER_CONTENT
+    #undef _
+  }
+  fprintf(stderr,"Pitcher: %s %s\n",verb,contentname);
+}
+ 
+static void fmn_hero_pitcher_begin() {
+  int16_t x=fmn_hero.x,y=fmn_hero.y;
+  switch (fmn_hero.facedir) {
+    case FMN_DIR_N: y-=FMN_MM_PER_TILE; break;
+    case FMN_DIR_S: y+=FMN_MM_PER_TILE; break;
+    case FMN_DIR_W: x-=FMN_MM_PER_TILE; break;
+    case FMN_DIR_E: x+=FMN_MM_PER_TILE; break;
+  }
+  uint8_t content=fmn_state_get_item_count(FMN_ITEM_pitcher);
+  if (content) {
+    fmn_hero_log_pitcher("pour",content);
+    fmn_state_set_item_count(FMN_ITEM_pitcher,0);
+    fmn_game_pour_fluid(x,y,content);
+  } else {
+    content=fmn_hero_find_pitcher_content(x,y);
+    fmn_hero_log_pitcher("pickup",content);
+    fmn_state_set_item_count(FMN_ITEM_pitcher,content);
+    if (content) {
+      //TODO "ta da!" sound effect
+      //TODO visual feedback, show what we picked up
+    } else {
+      //TODO repudiation sound effect
+    }
+  }
+  //...either way, keep action nonzero and display the pitcher in "pour" position until button released.
+}
+
 /* Update action.
  */
  
@@ -226,7 +305,7 @@ static void fmn_hero_begin_action() {
     case FMN_ITEM_violin: fmn_hero_violin_begin(); break;
     case FMN_ITEM_bell: fmn_hero_bell_begin(); break;
     case FMN_ITEM_chalk: fmn_hero_chalk_begin(); break;
-    case FMN_ITEM_pitcher: break;//TODO
+    case FMN_ITEM_pitcher: fmn_hero_pitcher_begin(); break;
     case FMN_ITEM_coin: break;//TODO
     case FMN_ITEM_match: break;//TODO
     case FMN_ITEM_corn: break;//TODO

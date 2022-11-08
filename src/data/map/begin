@@ -17,7 +17,8 @@ sprite 5 4 bug
 sprite 9 4 pushblock
 sprite 7 4 pushblock
 neighborw map1667043492264
-sprite 5 1 chalkboard 
-sprite 6 1 chalkboard 
-sprite 7 1 chalkboard 
-sprite 8 1 chalkboard 
+sprite 5 1 chalkboard
+sprite 6 1 chalkboard
+sprite 7 1 chalkboard
+sprite 8 1 chalkboard
+sprite 10 1 beehive 

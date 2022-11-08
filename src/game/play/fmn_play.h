@@ -33,4 +33,9 @@ void fmn_game_create_soulballs(int16_t xmm,int16_t ymm);
 uint8_t fmn_game_cast_spell(const uint8_t *v,uint8_t c);
 uint8_t fmn_game_cast_song(const uint8_t *v,uint8_t c);
 
+/* Dump the pitcher at some point in game space.
+ * (content) is one of FMN_PITCHER_CONTENT_*
+ */
+uint8_t fmn_game_pour_fluid(int16_t xmm,int16_t ymm,uint8_t content);
+
 #endif

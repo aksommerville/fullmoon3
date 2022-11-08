@@ -308,6 +308,12 @@ uint8_t fmn_game_cast_spell(const uint8_t *v,uint8_t c) {
 uint8_t fmn_game_cast_song(const uint8_t *v,uint8_t c) {
   while (c&&!v[c-1]) c--;
   while (c&&!v[0]) { c--; v++; }
+  if (!c) return 0;
   fmn_game_log_spell(__func__,v,c);
+  return 0;
+}
+
+uint8_t fmn_game_pour_fluid(int16_t xmm,int16_t ymm,uint8_t content) {
+  fprintf(stderr,"TODO %s (%d,%d) #%d\n",__func__,xmm,ymm,content);
   return 0;
 }

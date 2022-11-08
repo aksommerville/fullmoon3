@@ -32,11 +32,14 @@
 - - [x] Wand
 - - [x] Violin
 - - [x] Chalk
-- - [ ] Pitcher
+- - [x] Pitcher
 - - [x] Feather
 - - [ ] Matches
 - - [x] Bell
 - - [ ] Corn
+- - [ ] Shovel
+- - [ ] Compass
+- - [ ] Coins
 - [ ] Spells
 - [ ] Spell repudiation
 - [ ] Change hat
@@ -53,7 +56,7 @@
 
 ## Defects
 
-- [ ] fmn_game_cast_song() is getting re-called on map changes, with the most recent song.
-- [ ] Sometimes a buzz when changing screens. Related to the cast_song thing?
+- [x] fmn_game_cast_song() is getting re-called on map changes, with the most recent song.
+- [x] Sometimes a buzz when changing screens. Related to the cast_song thing? ...no. Sounds like the metronome.
 - [ ] Playing violin, prevent new notes from appearing at the left, sometimes they do briefly.
 - [ ] Ride broom and turn during neighbor screen transition, image gets doubled.

@@ -19,7 +19,7 @@ void fmn_state_reset_items() {
   fmn_state_item_count[FMN_ITEM_corn]=0;
   
   //XXX temp
-  fmn_state_item_selected=FMN_ITEM_chalk;
+  fmn_state_item_selected=FMN_ITEM_pitcher;
   fmn_state_item_possessed=0xffff;
   fmn_state_item_count[FMN_ITEM_pitcher]=1;
   fmn_state_item_count[FMN_ITEM_coin]=9;
@@ -57,6 +57,14 @@ uint8_t fmn_state_adjust_item_count(uint8_t itemid,int8_t d) {
   else if (nc>0xfe) nc=0xfe;
   if (nc==fmn_state_item_count[itemid]) return 0;
   fmn_state_item_count[itemid]=nc;
+  return 1;
+}
+
+uint8_t fmn_state_set_item_count(uint8_t itemid,uint8_t c) {
+  if (itemid>=16) return 0;
+  if (c==fmn_state_item_count[itemid]) return 0;
+  if (fmn_state_item_count[itemid]==0xff) return 0;
+  fmn_state_item_count[itemid]=c;
   return 1;
 }
 

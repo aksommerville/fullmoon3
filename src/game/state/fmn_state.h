@@ -20,6 +20,7 @@ uint16_t fmn_state_get_possessed_items(); // => bitfields, 1<<itemid
 void fmn_state_add_possessed_item(uint8_t itemid); // Possession is forever; no "remove"
 uint8_t fmn_state_get_item_count(uint8_t itemid); // => 255 if uncounted, 0..254 otherwise
 uint8_t fmn_state_adjust_item_count(uint8_t itemid,int8_t d); // => nonzero if changed; we manage clamping etc
+uint8_t fmn_state_set_item_count(uint8_t itemid,uint8_t c);
 uint8_t fmn_state_get_selected_item_if_possessed(); // 0..15; or 255 if not possessed
 // itemid:
 #define FMN_ITEM_broom       0
@@ -54,5 +55,18 @@ uint8_t fmn_state_get_selected_item_if_possessed(); // 0..15; or 255 if not poss
   _(compass) \
   _(todo1) \
   _(todo2)
+  
+#define FMN_PITCHER_CONTENT_none  0
+#define FMN_PITCHER_CONTENT_water 1
+#define FMN_PITCHER_CONTENT_honey 2
+#define FMN_PITCHER_CONTENT_milk  3
+#define FMN_PITCHER_CONTENT_sap   4
+#define FMN_PITCHER_CONTENT_COUNT 5
+#define FMN_FOR_EACH_PITCHER_CONTENT \
+  _(none) \
+  _(water) \
+  _(honey) \
+  _(milk) \
+  _(sap)
 
 #endif

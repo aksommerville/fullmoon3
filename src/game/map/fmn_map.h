@@ -26,11 +26,8 @@ struct fmn_map_resource {
   const void **refv;
 };
 
-/* Encoded maps are (FMN_COLC*FMN_ROWC==96) bytes of tile data, followed by a terminated command list.
- * There is a separate TOC of object references, which the serial commands refer to.
- * These are separate from the serial data because Arduino is a little weird about object lengths in progmem.
- * ***oops: We really can't have two separate things... TODO wrap in another struct
- * "decode" just copies the cells and yoinks a reference to the commands.
+/* Copy cells and record pointers to commands and references.
+ * Note that nothing beyond (v,cmdv,refv) is populated during decode.
  */
 void fmn_map_decode(struct fmn_map *dst,const struct fmn_map_resource *res);
 

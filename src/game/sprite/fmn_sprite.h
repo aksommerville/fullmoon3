@@ -118,6 +118,8 @@ extern const struct fmn_sprite_type fmn_sprite_type_bug;
 extern const struct fmn_sprite_type fmn_sprite_type_pushblock;
 extern const struct fmn_sprite_type fmn_sprite_type_alphabet;
 extern const struct fmn_sprite_type fmn_sprite_type_chalkboard;
+extern const struct fmn_sprite_type fmn_sprite_type_beehive;
+extern const struct fmn_sprite_type fmn_sprite_type_cow;
 
 #define FMN_FOR_EACH_SPRITE_TYPE \
   _(dummy) \
@@ -125,6 +127,8 @@ extern const struct fmn_sprite_type fmn_sprite_type_chalkboard;
   _(bug) \
   _(pushblock) \
   _(alphabet) \
-  _(chalkboard)
+  _(chalkboard) \
+  _(beehive) \
+  _(cow)
 
 #endif
