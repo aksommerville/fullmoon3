@@ -156,6 +156,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
     case FMN_ITEM_feather: fmn_hero_render_feather_active(fb,x,y); break;
     case FMN_ITEM_bell: fmn_hero_render_bell_active(fb,x,y); break;
     case FMN_ITEM_pitcher: fmn_hero_render_carry_small(fb,x,y,0x3f); break;
+    //case FMN_ITEM_match: break; // Hand disappears while you hold the button, it looks natural like striking a match.
   } else {
     uint8_t itemid=fmn_state_get_selected_item_if_possessed();
     switch (itemid) {
@@ -167,12 +168,44 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
       case FMN_ITEM_chalk: fmn_hero_render_carry_small(fb,x,y,0x5e); break;
       case FMN_ITEM_pitcher: fmn_hero_render_carry_small(fb,x,y,0x5f); break;
       case FMN_ITEM_coin:break;
-      case FMN_ITEM_match:break;
+      case FMN_ITEM_match: if (fmn_state_get_item_count(itemid)) fmn_hero_render_carry_small(fb,x,y,0x3e); break;
       case FMN_ITEM_corn:break;
       case FMN_ITEM_umbrella: fmn_hero_render_carry_wide(fb,x,y,0x42); break;
       case FMN_ITEM_shovel: fmn_hero_render_carry_wide(fb,x,y,0x44); break;
       case FMN_ITEM_compass:break;
     }
+  }
+}
+
+/* Decorative fire from a match.
+ */
+ 
+static void fmn_hero_render_fire(struct fmn_image *fb,int16_t x,int16_t y) {
+  uint8_t xform=0;
+  switch (fmn_hero.facedir) {
+    case FMN_DIR_W: {
+        x-=(FMN_TILESIZE*5)/8;
+        y-=(FMN_TILESIZE*4)/8;
+      } break;
+    case FMN_DIR_E: {
+        x+=(FMN_TILESIZE*5)/8;
+        y-=(FMN_TILESIZE*4)/8;
+      } break;
+    case FMN_DIR_N: {
+        x+=(FMN_TILESIZE*2)/8;
+        y-=(FMN_TILESIZE*9)/8;
+      } break;
+    case FMN_DIR_S: {
+        x-=(FMN_TILESIZE*0)/8;
+        y+=(FMN_TILESIZE*7)/8;
+        xform=FMN_XFORM_YREV;
+      } break;
+  }
+  switch ((fmn_hero.firetime%60)/15) {
+    case 0: fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x3c,xform); break;
+    case 1: fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x3d,xform); break;
+    case 2: fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x3c,xform|FMN_XFORM_XREV); break;
+    case 3: fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x3d,xform|FMN_XFORM_XREV); break;
   }
 }
 
@@ -190,9 +223,10 @@ static void _hero_render(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t 
     case FMN_ITEM_violin: fmn_hero_render_violin(fb,x,y); return;
   }
   
-  // Item renders before body when facing north only.
+  // Item and fire render before body when facing north only.
   if (fmn_hero.facedir==FMN_DIR_N) {
     fmn_hero_render_item(fb,x,y);
+    if (fmn_hero.firetime) fmn_hero_render_fire(fb,x,y);
   }
   
   // Body.
@@ -227,6 +261,9 @@ static void _hero_render(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t 
     case FMN_DIR_S: case FMN_DIR_E: fmn_image_blit(fb,dstx-1,dsty,src,0,0,FMN_TILESIZE<<1,FMN_TILESIZE,0); break;
     default: fmn_image_blit(fb,dstx,dsty,src,0,0,FMN_TILESIZE<<1,FMN_TILESIZE,0);
   }
+  
+  // Match fire (even if you change items).
+  if (fmn_hero.firetime&&(fmn_hero.facedir!=FMN_DIR_N)) fmn_hero_render_fire(fb,x,y);
 }
 
 /* Type definition.

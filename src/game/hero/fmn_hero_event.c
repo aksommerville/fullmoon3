@@ -272,6 +272,19 @@ static void fmn_hero_pitcher_begin() {
   //...either way, keep action nonzero and display the pitcher in "pour" position until button released.
 }
 
+/* Matches.
+ */
+ 
+static void fmn_hero_match_begin() {
+  if (fmn_state_adjust_item_count(FMN_ITEM_match,-1)) {
+    fmn_game_generate_light(FMN_HERO_MATCH_FIRE_TIME);
+    fmn_hero.firetime=FMN_HERO_MATCH_FIRE_TIME;
+    //TODO strike match sound effect
+  } else {
+    //TODO repudiation sound effect
+  }
+}
+
 /* Update action.
  */
  
@@ -307,7 +320,7 @@ static void fmn_hero_begin_action() {
     case FMN_ITEM_chalk: fmn_hero_chalk_begin(); break;
     case FMN_ITEM_pitcher: fmn_hero_pitcher_begin(); break;
     case FMN_ITEM_coin: break;//TODO
-    case FMN_ITEM_match: break;//TODO
+    case FMN_ITEM_match: fmn_hero_match_begin(); break;
     case FMN_ITEM_corn: break;//TODO
     case FMN_ITEM_umbrella: break;//TODO
     case FMN_ITEM_shovel: break;//TODO
@@ -326,7 +339,6 @@ static void fmn_hero_end_action() {
     case FMN_ITEM_broom: fmn_hero_broom_end(); return; // sic return; might retain (action)
     case FMN_ITEM_wand: fmn_hero_wand_end(); break;
     case FMN_ITEM_violin: fmn_hero_violin_end(); break;
-    case FMN_ITEM_match: break;//TODO turn lights back off
   }
   fmn_hero.action=-1;
 }

@@ -67,6 +67,10 @@ void fmn_hero_update() {
   fmn_hero_update_animation();
   fmn_hero_update_action();
   
+  if (fmn_hero.firetime>0) {
+    fmn_hero.firetime--;
+  }
+  
   // We have to update the sprite again, otherwise sprites lower than ours in the list will see our prior position instead of current.
   uint8_t i=fmn_spritec;
   struct fmn_sprite *sprite=fmn_spritev;

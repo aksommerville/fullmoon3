@@ -16,6 +16,7 @@
 
 #define FMN_HERO_PUSH_DELAY 20
 #define FMN_SPELL_LIMIT 10 /* Must be at least one longer than the longest defined spell. */
+#define FMN_HERO_MATCH_FIRE_TIME 300
 
 extern struct fmn_hero {
   int16_t x,y; // Center, mm.
@@ -41,6 +42,7 @@ extern struct fmn_hero {
   uint8_t spellv[FMN_SPELL_LIMIT];
   uint8_t spellc;
   uint8_t violindir;
+  uint16_t firetime;
   
 } fmn_hero;
 

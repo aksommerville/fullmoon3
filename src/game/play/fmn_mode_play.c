@@ -17,6 +17,8 @@
 
 struct fmn_map fmn_map={0};
 
+static uint16_t fmn_play_light_time=0;
+
 static struct fmn_transition fmn_play_transition={0};
 
 static uint8_t fmn_play_transition_bits_storage[(FMN_COLC*FMN_TILESIZE*FMN_ROWC*FMN_TILESIZE+3)>>2];
@@ -65,6 +67,7 @@ void fmn_game_reset() {
   fmn_hero_reset();
   fmn_spritev_clear();
   fmn_state_reset_items();
+  fmn_play_light_time=0;
   
   fmn_map_decode(&fmn_map,&fmnr_map_begin);
   struct fmn_game_cb_mapcmd_load_context ctx={0};
@@ -164,6 +167,12 @@ void fmn_game_mode_play_update() {
       // All normal updating is suspended while transition in progress.
       //TODO Maybe permit sprites to animate but not move or interact?
       return;
+    }
+  }
+  
+  if (fmn_play_light_time) {
+    if (!--fmn_play_light_time) {
+      fprintf(stderr,"TODO lights out [%s:%d]\n",__FILE__,__LINE__);
     }
   }
   
@@ -316,4 +325,9 @@ uint8_t fmn_game_cast_song(const uint8_t *v,uint8_t c) {
 uint8_t fmn_game_pour_fluid(int16_t xmm,int16_t ymm,uint8_t content) {
   fprintf(stderr,"TODO %s (%d,%d) #%d\n",__func__,xmm,ymm,content);
   return 0;
+}
+
+void fmn_game_generate_light(uint16_t framec) {
+  fprintf(stderr,"TODO %s %d\n",__func__,framec);
+  fmn_play_light_time=framec;
 }

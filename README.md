@@ -34,7 +34,7 @@
 - - [x] Chalk
 - - [x] Pitcher
 - - [x] Feather
-- - [ ] Matches
+- - [x] Matches
 - - [x] Bell
 - - [ ] Corn
 - - [ ] Shovel

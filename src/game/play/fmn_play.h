@@ -38,4 +38,9 @@ uint8_t fmn_game_cast_song(const uint8_t *v,uint8_t c);
  */
 uint8_t fmn_game_pour_fluid(int16_t xmm,int16_t ymm,uint8_t content);
 
+/* Illuminate dark rooms, for so many frames.
+ * If we are already illuminated, this resets the clock, they don't add.
+ */
+void fmn_game_generate_light(uint16_t framec);
+
 #endif
