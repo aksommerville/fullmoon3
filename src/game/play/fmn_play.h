@@ -43,4 +43,6 @@ uint8_t fmn_game_pour_fluid(int16_t xmm,int16_t ymm,uint8_t content);
  */
 void fmn_game_generate_light(uint16_t framec);
 
+uint8_t fmn_game_get_compass_target(int16_t *xmm,int16_t *ymm);
+
 #endif

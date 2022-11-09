@@ -50,6 +50,7 @@ void fmn_map_decode(struct fmn_map *dst,const struct fmn_map_resource *res);
 #define FMN_MAP_CMD_NEIGHBORN    0x25
 #define FMN_MAP_CMD_NEIGHBORS    0x26
 #define FMN_MAP_CMD_HOME         0x27
+#define FMN_MAP_CMD_COMPASS      0x40
 #define FMN_MAP_CMD_EVENT1       0x60
 #define FMN_MAP_CMD_CELLIF       0x61
 #define FMN_MAP_CMD_DOOR         0x62

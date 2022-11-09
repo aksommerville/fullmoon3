@@ -169,6 +169,7 @@ export class MapCanvas {
       case "cellif": this._addBadge(command[2], command[3], 0x02, command); break;
       case "door": this._addBadge(command[1], command[2], 0x03, command); break;
       case "sprite": this._addBadge(command[1], command[2], 0x04, command); break; //TODO might want more detail for display
+      case "compass": this._addBadge(command[1], command[2], 0x05, command); break;
     }
   }
   

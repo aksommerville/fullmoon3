@@ -36,9 +36,9 @@
 - - [x] Feather
 - - [x] Matches
 - - [x] Bell
-- - [ ] Corn
-- - [ ] Shovel
-- - [ ] Compass
+- - [x] Corn
+- - [x] Shovel
+- - [x] Compass
 - - [ ] Coins
 - [ ] Spells
 - [ ] Spell repudiation

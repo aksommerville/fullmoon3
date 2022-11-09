@@ -1,4 +1,5 @@
 #include "fmn_hero_internal.h"
+#include <math.h>
 
 /* Init.
  */
@@ -115,6 +116,47 @@ static void fmn_hero_render_bell_active(struct fmn_image *fb,int16_t x,int16_t y
   }
 }
 
+/* Shovel.
+ */
+ 
+static void fmn_hero_render_shovel_active(struct fmn_image *fb,int16_t x,int16_t y) {
+  switch (fmn_hero.facedir) {
+    case FMN_DIR_W: x-=FMN_TILESIZE>>1; break;
+    case FMN_DIR_E: x+=FMN_TILESIZE>>1; break;
+    case FMN_DIR_N: y-=FMN_TILESIZE>>1; break;
+    case FMN_DIR_S: y+=FMN_TILESIZE>>1; break;
+  }
+  if (fmn_hero.actiontime<20) {
+    fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x54,FMN_XFORM_YREV);
+  } else if (fmn_hero.actiontime<60) {
+    fmn_image_blit_tile(fb,x,y,&fmnr_image_hero,0x54,0);
+         if (fmn_hero.actiontime<30) fmn_image_blit_tile(fb,x,y-FMN_TILESIZE,&fmnr_image_hero,0x46,0);
+    else if (fmn_hero.actiontime<40) fmn_image_blit_tile(fb,x,y-FMN_TILESIZE,&fmnr_image_hero,0x47,0);
+  }
+}
+
+/* Compass.
+ */
+ 
+static void fmn_hero_render_compass_active(struct fmn_image *fb,int16_t x,int16_t y) {
+  int16_t tx,ty;
+  if (!fmn_game_get_compass_target(&tx,&ty)) return;
+  float dx=tx-fmn_hero.x,dy=ty-fmn_hero.y;
+  float distance=sqrtf(dx*dx+dy*dy);
+  float radius=FMN_TILESIZE*1.0f;
+  int16_t normdx=(radius*dx)/distance;
+  int16_t normdy=(radius*dy)/distance;
+  uint8_t tileid=0x70,xform=0;
+  if (normdx>0) xform|=FMN_XFORM_XREV;
+  if (normdy>0) xform|=FMN_XFORM_YREV;
+  int16_t adx=(normdx<0)?-normdx:normdx;
+  int16_t ady=(normdy<0)?-normdy:normdy;
+  if (adx>=ady<<1) tileid+=2;
+  else if (ady>=adx<<1) ;
+  else tileid+=1;
+  fmn_image_blit_tile(fb,x+normdx,y+normdy,&fmnr_image_hero,tileid,xform);
+}
+
 /* Render carried item.
  */
  
@@ -157,6 +199,9 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
     case FMN_ITEM_bell: fmn_hero_render_bell_active(fb,x,y); break;
     case FMN_ITEM_pitcher: fmn_hero_render_carry_small(fb,x,y,0x3f); break;
     //case FMN_ITEM_match: break; // Hand disappears while you hold the button, it looks natural like striking a match.
+    case FMN_ITEM_corn: fmn_hero_render_carry_small(fb,x,y,0x6a); break;
+    case FMN_ITEM_shovel: fmn_hero_render_shovel_active(fb,x,y); break;
+    case FMN_ITEM_compass: fmn_hero_render_compass_active(fb,x,y); break;
   } else {
     uint8_t itemid=fmn_state_get_selected_item_if_possessed();
     switch (itemid) {
@@ -167,9 +212,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
       case FMN_ITEM_bell: fmn_hero_render_carry_small(fb,x,y,0x5b); break;
       case FMN_ITEM_chalk: fmn_hero_render_carry_small(fb,x,y,0x5e); break;
       case FMN_ITEM_pitcher: fmn_hero_render_carry_small(fb,x,y,0x5f); break;
-      case FMN_ITEM_coin:break;
       case FMN_ITEM_match: if (fmn_state_get_item_count(itemid)) fmn_hero_render_carry_small(fb,x,y,0x3e); break;
-      case FMN_ITEM_corn:break;
       case FMN_ITEM_umbrella: fmn_hero_render_carry_wide(fb,x,y,0x42); break;
       case FMN_ITEM_shovel: fmn_hero_render_carry_wide(fb,x,y,0x44); break;
       case FMN_ITEM_compass:break;
@@ -223,8 +266,15 @@ static void _hero_render(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t 
     case FMN_ITEM_violin: fmn_hero_render_violin(fb,x,y); return;
   }
   
-  // Item and fire render before body when facing north only.
+  // Item and match fire are usually drawn after the body.
+  // If facing north and not compass, we instead draw it first.
+  uint8_t itemafter=1;
   if (fmn_hero.facedir==FMN_DIR_N) {
+    if (fmn_hero.action!=FMN_ITEM_compass) {
+      itemafter=0;
+    }
+  }
+  if (!itemafter) {
     fmn_hero_render_item(fb,x,y);
     if (fmn_hero.firetime) fmn_hero_render_fire(fb,x,y);
   }
@@ -249,11 +299,6 @@ static void _hero_render(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t 
     case FMN_DIR_E: fmn_image_blit_tile(fb,x,dsty,src,0x11,0); break;
   }
   
-  // Item, facing anywhere but north.
-  if (fmn_hero.facedir!=FMN_DIR_N) {
-    fmn_hero_render_item(fb,x,y);
-  }
-  
   // Hat.
   int16_t dstx=x-FMN_TILESIZE;
   dsty=y-((FMN_TILESIZE*10)>>3)-(FMN_TILESIZE>>1);
@@ -262,8 +307,11 @@ static void _hero_render(struct fmn_image *fb,struct fmn_sprite *sprite,int16_t 
     default: fmn_image_blit(fb,dstx,dsty,src,0,0,FMN_TILESIZE<<1,FMN_TILESIZE,0);
   }
   
-  // Match fire (even if you change items).
-  if (fmn_hero.firetime&&(fmn_hero.facedir!=FMN_DIR_N)) fmn_hero_render_fire(fb,x,y);
+  // Item and fire.
+  if (itemafter) {
+    fmn_hero_render_item(fb,x,y);
+    if (fmn_hero.firetime&&(fmn_hero.facedir!=FMN_DIR_N)) fmn_hero_render_fire(fb,x,y);
+  }
 }
 
 /* Type definition.

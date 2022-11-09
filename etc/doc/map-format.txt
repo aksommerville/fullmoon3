@@ -23,6 +23,8 @@ neighbors MAPID
 
 home MAPID
 
+compass X Y DIR
+
 event EVID HOOKID [ARGS...]
 
 cellif FLAGID X Y TILEID

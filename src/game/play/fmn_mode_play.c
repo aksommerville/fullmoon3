@@ -331,3 +331,59 @@ void fmn_game_generate_light(uint16_t framec) {
   fprintf(stderr,"TODO %s %d\n",__func__,framec);
   fmn_play_light_time=framec;
 }
+
+/* Compass target.
+ */
+ 
+struct fmn_game_get_compass_target_context {
+  int16_t *xmm;
+  int16_t *ymm;
+  uint8_t col;
+  uint8_t row;
+  int16_t herox;
+  int16_t heroy;
+};
+
+static int8_t fmn_game_get_compass_target_cb(uint8_t cmd,const uint8_t *argv,uint8_t argc,void *userdata) {
+  struct fmn_game_get_compass_target_context *ctx=userdata;
+  if (cmd==FMN_MAP_CMD_COMPASS) {
+    uint8_t tcol=argv[0]>>4;
+    uint8_t trow=argv[0]&15;
+    if (tcol!=ctx->col) return 0;
+    if (trow!=ctx->row) return 0;
+    *(ctx->xmm)=ctx->herox;
+    *(ctx->ymm)=ctx->heroy;
+    switch (argv[1]) {
+      case FMN_DIR_N: (*(ctx->ymm))-=FMN_MM_PER_TILE; break;
+      case FMN_DIR_S: (*(ctx->ymm))+=FMN_MM_PER_TILE; break;
+      case FMN_DIR_W: (*(ctx->xmm))-=FMN_MM_PER_TILE; break;
+      case FMN_DIR_E: (*(ctx->xmm))+=FMN_MM_PER_TILE; break;
+      case FMN_DIR_NW: (*(ctx->xmm))-=FMN_MM_PER_TILE; (*(ctx->ymm))-=FMN_MM_PER_TILE; break;
+      case FMN_DIR_NE: (*(ctx->xmm))+=FMN_MM_PER_TILE; (*(ctx->ymm))-=FMN_MM_PER_TILE; break;
+      case FMN_DIR_SW: (*(ctx->xmm))-=FMN_MM_PER_TILE; (*(ctx->ymm))+=FMN_MM_PER_TILE; break;
+      case FMN_DIR_SE: (*(ctx->xmm))+=FMN_MM_PER_TILE; (*(ctx->ymm))+=FMN_MM_PER_TILE; break;
+    }
+    return 1;
+  }
+  return 0;
+}
+ 
+uint8_t fmn_game_get_compass_target(int16_t *xmm,int16_t *ymm) {
+  //TODO compass. Only the natural uses should apply here. Point to some real secret.
+  
+  // Check for special things called out by the map.
+  struct fmn_game_get_compass_target_context ctx={
+    .xmm=xmm,
+    .ymm=ymm,
+  };
+  fmn_hero_get_position(&ctx.herox,&ctx.heroy);
+  if ((ctx.herox>=0)&&(ctx.herox<FMN_COLC*FMN_MM_PER_TILE)&&(ctx.heroy>=0)&&(ctx.heroy<FMN_ROWC*FMN_MM_PER_TILE)) {
+    ctx.col=ctx.herox/FMN_MM_PER_TILE;
+    ctx.row=ctx.heroy/FMN_MM_PER_TILE;
+    if (fmn_map_for_each_command(fmn_map.cmdv,fmn_game_get_compass_target_cb,&ctx)) return 1;
+  }
+  
+  *xmm=(FMN_COLC*FMN_MM_PER_TILE)>>1;
+  *ymm=(FMN_ROWC*FMN_MM_PER_TILE)>>1;
+  return 1;
+}

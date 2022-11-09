@@ -118,6 +118,7 @@ void fmn_hero_update_walk() {
   switch (fmn_hero.action) {
     case FMN_ITEM_wand:
     case FMN_ITEM_violin:
+    case FMN_ITEM_shovel:
       return;
   }
 

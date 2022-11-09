@@ -285,6 +285,64 @@ static void fmn_hero_match_begin() {
   }
 }
 
+/* Corn.
+ */
+ 
+static void fmn_hero_corn_begin() {
+  if (fmn_state_adjust_item_count(FMN_ITEM_corn,-1)) {
+    struct fmn_sprite *corn=fmn_game_spawn_sprite(&fmn_sprite_type_corn,0,0,0,0);
+    if (corn) {
+      corn->x=fmn_hero.x;
+      corn->y=fmn_hero.y;
+      switch (fmn_hero.facedir) {
+        case FMN_DIR_W: corn->x-=FMN_MM_PER_TILE; break;
+        case FMN_DIR_E: corn->x+=FMN_MM_PER_TILE; break;
+        case FMN_DIR_N: corn->y-=FMN_MM_PER_TILE; break;
+        case FMN_DIR_S: corn->y+=FMN_MM_PER_TILE; break;
+      }
+    }
+    //TODO sound effect
+  } else {
+    //TODO repudiation sound effect
+    fmn_hero.action=-1;
+  }
+}
+
+/* Shovel.
+ */
+ 
+static void fmn_hero_shovel_update() {
+  if (fmn_hero.actiontime>60) {
+    fmn_hero.action=-1;
+  } else if (fmn_hero.actiontime==20) {
+    int16_t x=fmn_hero.x,y=fmn_hero.y;
+    switch (fmn_hero.facedir) {
+      case FMN_DIR_W: x-=FMN_MM_PER_TILE>>1; break;
+      case FMN_DIR_E: x+=FMN_MM_PER_TILE>>1; break;
+      case FMN_DIR_N: y-=FMN_MM_PER_TILE>>1; break;
+      case FMN_DIR_S: y+=FMN_MM_PER_TILE>>1; break;
+    }
+    if (
+      fmn_map.tilesheet&&fmn_map.tilesheet->tileprops&&
+      (x>=0)&&(y>=0)&&(x<FMN_COLC*FMN_MM_PER_TILE)&&(y<FMN_ROWC*FMN_MM_PER_TILE)
+    ) {
+      x/=FMN_MM_PER_TILE;
+      y/=FMN_MM_PER_TILE;
+      uint8_t tileid=fmn_map.v[y*FMN_COLC+x];
+      if ((tileid==0x06)||(fmn_map.tilesheet->tileprops[tileid>>2]&(0xc0>>(tileid&3)))) {
+        fprintf(stderr,"TODO shovel repudiation at %d,%d (0x%02x) %s:%d\n",x,y,tileid,__FILE__,__LINE__);
+      } else {
+        fprintf(stderr,"TODO dig up cell (%d,%d) tileid=0x%02x %s:%d\n",x,y,tileid,__FILE__,__LINE__);
+        fmn_map.v[y*FMN_COLC+x]=0x06;
+      }
+    }
+  }
+}
+
+static void fmn_hero_shovel_end() {
+  fmn_hero.action=FMN_ITEM_shovel;
+}
+
 /* Update action.
  */
  
@@ -297,7 +355,7 @@ void fmn_hero_update_action() {
     case FMN_ITEM_wand: fmn_hero_wand_update(); break;
     case FMN_ITEM_violin: fmn_hero_violin_update(); break;
     case FMN_ITEM_bell: fmn_hero_bell_update(); break;
-    case FMN_ITEM_match: break;//TODO
+    case FMN_ITEM_shovel: fmn_hero_shovel_update(); break;
     case FMN_ITEM_umbrella: break;//TODO
     case FMN_ITEM_compass: break;//TODO
   }
@@ -321,7 +379,7 @@ static void fmn_hero_begin_action() {
     case FMN_ITEM_pitcher: fmn_hero_pitcher_begin(); break;
     case FMN_ITEM_coin: break;//TODO
     case FMN_ITEM_match: fmn_hero_match_begin(); break;
-    case FMN_ITEM_corn: break;//TODO
+    case FMN_ITEM_corn: fmn_hero_corn_begin(); break;
     case FMN_ITEM_umbrella: break;//TODO
     case FMN_ITEM_shovel: break;//TODO
     case FMN_ITEM_compass: break;//TODO
@@ -339,6 +397,7 @@ static void fmn_hero_end_action() {
     case FMN_ITEM_broom: fmn_hero_broom_end(); return; // sic return; might retain (action)
     case FMN_ITEM_wand: fmn_hero_wand_end(); break;
     case FMN_ITEM_violin: fmn_hero_violin_end(); break;
+    case FMN_ITEM_shovel: fmn_hero_shovel_end(); return; // sic return
   }
   fmn_hero.action=-1;
 }

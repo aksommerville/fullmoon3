@@ -136,6 +136,7 @@ export class FullmoonMap {
       case "hero": return [+command[1], +command[2]];
       case "cellif": return [+command[2], +command[3]];
       case "sprite": return [+command[1], +command[2]];
+      case "compass": return [+command[1], +command[2]];
     }
     return null;
   }
@@ -160,6 +161,7 @@ export class FullmoonMap {
       case "hero": command[1] = x; command[2] = y; return true;
       case "cellif": command[2] = x; command[3] = y; return true;
       case "sprite": command[1] = x; command[2] = y; return true;
+      case "compass": command[1] = x; command[2] = y; return true;
     }
     return false;
   }
@@ -201,6 +203,9 @@ FullmoonMap.COMMANDS_SCHEMA = [{
 }, {
   keyword: "home",
   args: ["map"],
+}, {
+  keyword: "compass",
+  args: ["x", "y", "dir"],
 }, {
   keyword: "event",
   args: ["event", "hook", "args"],//TODO loose data

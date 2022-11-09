@@ -124,6 +124,17 @@ export class NewMapCommandModal {
           attr.type = "text";
           //TODO datalist with hook names -- new REST call
         } break;
+      case "dir": {
+          const input = this.dom.spawn(parent, "SELECT", attr);
+          this.dom.spawn(input, "OPTION", "N", { value: "N" });
+          this.dom.spawn(input, "OPTION", "S", { value: "S" });
+          this.dom.spawn(input, "OPTION", "W", { value: "W" });
+          this.dom.spawn(input, "OPTION", "E", { value: "E" });
+          this.dom.spawn(input, "OPTION", "NW", { value: "NW" });
+          this.dom.spawn(input, "OPTION", "NE", { value: "NE" });
+          this.dom.spawn(input, "OPTION", "SW", { value: "SW" });
+          this.dom.spawn(input, "OPTION", "SE", { value: "SE" });
+        } return;
       default: {
           attr.type = "text";
         }

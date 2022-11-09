@@ -107,7 +107,46 @@ static int mapcvt_cmd_home(const struct mapcvt_token *tokenv,int tokenc,const ch
   return mapcvt_cmd_single_object("fmnr_map_",FMN_MAP_CMD_HOME,tokenv,tokenc,path,lineno);
 }
 
-/* "hero"
+/* "compass" X Y DIR
+ */
+ 
+static int mapcvt_cmd_compass(const struct mapcvt_token *tokenv,int tokenc,const char *path,int lineno) {
+  if ((tokenc!=3)||!tokenv[0].vok||!tokenv[1].vok) {
+    fprintf(stderr,"%s:%d: Expected 'X Y DIR' after 'compass'\n",path,lineno);
+    return -2;
+  }
+  if (
+    (tokenv[0].v<0)||(tokenv[0].v>=FMN_COLC)||
+    (tokenv[1].v<0)||(tokenv[1].v>=FMN_ROWC)
+  ) {
+    fprintf(stderr,
+      "%s:%d: Compass position must be in 0..(%d,%d)-1, found (%d,%d)\n",
+      path,lineno,FMN_COLC,FMN_ROWC,tokenv[0].v,tokenv[1].v
+    );
+    return -2;
+  }
+  uint8_t dir;
+       if ((tokenv[2].srcc==1)&&!memcmp(tokenv[2].src,"N",1)) dir=FMN_DIR_N;
+  else if ((tokenv[2].srcc==1)&&!memcmp(tokenv[2].src,"S",1)) dir=FMN_DIR_S;
+  else if ((tokenv[2].srcc==1)&&!memcmp(tokenv[2].src,"W",1)) dir=FMN_DIR_W;
+  else if ((tokenv[2].srcc==1)&&!memcmp(tokenv[2].src,"E",1)) dir=FMN_DIR_E;
+  else if ((tokenv[2].srcc==2)&&!memcmp(tokenv[2].src,"NW",2)) dir=FMN_DIR_NW;
+  else if ((tokenv[2].srcc==2)&&!memcmp(tokenv[2].src,"NE",2)) dir=FMN_DIR_NE;
+  else if ((tokenv[2].srcc==2)&&!memcmp(tokenv[2].src,"SW",2)) dir=FMN_DIR_SW;
+  else if ((tokenv[2].srcc==2)&&!memcmp(tokenv[2].src,"SE",2)) dir=FMN_DIR_SE;
+  else {
+    fprintf(stderr,
+      "%s:%d: Expected a direction 'N','NE',etc, found '%.*s'\n",
+      path,lineno,tokenv[2].srcc,tokenv[2].src
+    );
+    return -2;
+  }
+  uint8_t cmd[]={FMN_MAP_CMD_COMPASS,(tokenv[0].v<<4)|tokenv[1].v,dir};
+  if (fmn_encode_raw(&mapcvt.bin,cmd,sizeof(cmd))<0) return -1;
+  return 0;
+}
+
+/* "hero" X Y
  */
  
 static int mapcvt_cmd_hero(const struct mapcvt_token *tokenv,int tokenc,const char *path,int lineno) {
@@ -291,6 +330,7 @@ static int mapcvt_decode_command(const char *src,int srcc,const char *path,int l
   if ((kwc==9)&&!memcmp(kw,"neighborn",9)) return mapcvt_cmd_neighborn(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==9)&&!memcmp(kw,"neighbors",9)) return mapcvt_cmd_neighbors(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==4)&&!memcmp(kw,"home",4)) return mapcvt_cmd_home(tokenv+1,tokenc-1,path,lineno);
+  if ((kwc==7)&&!memcmp(kw,"compass",7)) return mapcvt_cmd_compass(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==5)&&!memcmp(kw,"event",5)) return mapcvt_cmd_event(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==6)&&!memcmp(kw,"cellif",6)) return mapcvt_cmd_cellif(tokenv+1,tokenc-1,path,lineno);
   if ((kwc==4)&&!memcmp(kw,"door",4)) return mapcvt_cmd_door(tokenv+1,tokenc-1,path,lineno);
