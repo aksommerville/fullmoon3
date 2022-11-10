@@ -13,9 +13,9 @@
 - - - [ ] Hooks
 - [ ] Targets
 - - [ ] Web
+- - - [ ] Audio
 - - [ ] Linux DRM
 - - [ ] Windows
-- - [x] MacOS
 - - [ ] Thumby
 - - [ ] Picosystem
 - - [ ] Mac 68k
@@ -26,21 +26,16 @@
 - [ ] Save game
 - [ ] Spriteless treadle and stompbox
 - [ ] Map-based events
-- [x] Weapons, first pass.
-- - [x] Broom
-- - [x] Umbrella
-- - [x] Wand
-- - [x] Violin
-- - [x] Chalk
-- - [x] Pitcher
-- - [x] Feather
-- - [x] Matches
-- - [x] Bell
-- - [x] Corn
-- - [x] Shovel
-- - [x] Compass
-- - [x] Coins
 - [ ] Spells
+- - [ ] Wind
+- - [ ] Rain
+- - [ ] Slow motion
+- - [ ] Opening
+- - [ ] Invisibility
+- - [ ] (song) Healing
+- - [ ] (song) Trailhead teleport
+- - [ ] (song) Home teleport
+- - [ ] (song) A/B flip
 - [ ] Spell repudiation
 - [ ] Change hat
 - [ ] Sound effects
@@ -60,3 +55,5 @@
 - [x] Sometimes a buzz when changing screens. Related to the cast_song thing? ...no. Sounds like the metronome.
 - [ ] Playing violin, prevent new notes from appearing at the left, sometimes they do briefly.
 - [ ] Ride broom and turn during neighbor screen transition, image gets doubled.
+- [ ] Songs dropping notes or something.
+- [ ] Wasm build exports like every function, dozens or hundreds of them. Find out how to pare that down.

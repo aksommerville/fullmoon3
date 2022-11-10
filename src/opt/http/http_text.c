@@ -83,6 +83,7 @@ const char *http_guess_content_type(const char *path,const void *src,int srcc) {
   if (src) {
     if ((srcc>=8)&&!memcmp(src,"\x89PNG\r\n\x1a\n",8)) return "image/png";
     if ((srcc>=8)&&!memcmp(src,"MThd\0\0\0\6",8)) return "audio/midi";
+    if ((srcc>=4)&&!memcmp(src,"\0asm",4)) return "application/wasm";
   }
   
   // Next consider the path suffix.
@@ -131,6 +132,7 @@ const char *http_guess_content_type(const char *path,const void *src,int srcc) {
             if (!memcmp(sfx,"html",4)) return "text/html";
             if (!memcmp(sfx,"jpeg",4)) return "image/jpeg";
             if (!memcmp(sfx,"json",4)) return "application/json";
+            if (!memcmp(sfx,"wasm",4)) return "application/wasm";
           } break;
       }
     }

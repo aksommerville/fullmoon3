@@ -5,6 +5,9 @@
 # FMN_TARGETS names files under etc/target/ to build for.
 FMN_TARGETS:=linux tiny
 
+# https://github.com/WebAssembly/wasi-sdk
+web_WASI_SDK:=
+
 # https://arduino.cc
 tiny_ARDUINO_HOME:=/home/andy/.arduino15
 tiny_ARDUINO_IDE_HOME:=/home/andy/pkg/arduino-1.8.19

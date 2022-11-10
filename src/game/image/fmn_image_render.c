@@ -41,7 +41,7 @@ void fmn_image_fill_rect(struct fmn_image *image,int16_t x,int16_t y,int16_t w,i
         int16_t alignl=(x+3)&~3;
         int16_t alignr=(x+w)&~3;
         if (alignr>alignl) {
-          uint8_t byte=pixel|pixel<<2; byte|=byte<<4;
+          uint8_t byte=pixel|(pixel<<2); byte|=byte<<4;
           int16_t bc=(alignr-alignl)>>2;
           uint8_t *dstrow=((uint8_t*)image->v)+y*image->stride+(alignl>>2);
           int8_t yi=h;
