@@ -26,9 +26,9 @@
 - [ ] Save game
 - [ ] Spriteless treadle and stompbox
 - [ ] Map-based events
-- [ ] Weapons, first pass.
+- [x] Weapons, first pass.
 - - [x] Broom
-- - [ ] Umbrella
+- - [x] Umbrella
 - - [x] Wand
 - - [x] Violin
 - - [x] Chalk
@@ -39,7 +39,7 @@
 - - [x] Corn
 - - [x] Shovel
 - - [x] Compass
-- - [ ] Coins
+- - [x] Coins
 - [ ] Spells
 - [ ] Spell repudiation
 - [ ] Change hat

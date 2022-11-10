@@ -25,6 +25,13 @@ struct fmn_sprite *fmn_game_spawn_sprite(
 
 void fmn_game_create_soulballs(int16_t xmm,int16_t ymm);
 
+struct fmn_sprite *fmn_game_spawn_missile(
+  int16_t xmm,int16_t ymm,
+  int16_t targetxmm,int16_t targetymm,
+  int16_t speedmm,
+  uint8_t tileid
+);
+
 /* (v) contains FMN_DIR_(W,E,N,S).
  * Returns nonzero if this is a real spell and we performed it.
  * btw a song is just a different set of spells; they work exactly the same way.

@@ -19,7 +19,7 @@ void fmn_state_reset_items() {
   fmn_state_item_count[FMN_ITEM_corn]=0;
   
   //XXX temp
-  fmn_state_item_selected=FMN_ITEM_compass;
+  fmn_state_item_selected=FMN_ITEM_umbrella;
   fmn_state_item_possessed=0xffff;
   fmn_state_item_count[FMN_ITEM_pitcher]=1;
   fmn_state_item_count[FMN_ITEM_coin]=9;

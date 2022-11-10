@@ -122,6 +122,7 @@ extern const struct fmn_sprite_type fmn_sprite_type_beehive;
 extern const struct fmn_sprite_type fmn_sprite_type_cow;
 extern const struct fmn_sprite_type fmn_sprite_type_corn;
 extern const struct fmn_sprite_type fmn_sprite_type_crow;
+extern const struct fmn_sprite_type fmn_sprite_type_missile;
 
 #define FMN_FOR_EACH_SPRITE_TYPE \
   _(dummy) \
@@ -133,6 +134,9 @@ extern const struct fmn_sprite_type fmn_sprite_type_crow;
   _(beehive) \
   _(cow) \
   _(corn) \
-  _(crow)
+  _(crow) \
+  _(missile)
+  
+void fmn_sprite_missile_setup(struct fmn_sprite *sprite,int16_t dxmm,int16_t dymm,int16_t speedmm);
 
 #endif

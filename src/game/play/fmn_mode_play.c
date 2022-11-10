@@ -292,6 +292,24 @@ void fmn_game_create_soulballs(int16_t xmm,int16_t ymm) {
   fprintf(stderr,"TODO %s %d,%d\n",__func__,xmm,ymm);
 }
 
+/* Missile.
+ */
+ 
+struct fmn_sprite *fmn_game_spawn_missile(
+  int16_t xmm,int16_t ymm,
+  int16_t targetxmm,int16_t targetymm,
+  int16_t speedmm,
+  uint8_t tileid
+) {
+  struct fmn_sprite *sprite=fmn_game_spawn_sprite(&fmn_sprite_type_missile,0,0,0,0);
+  if (!sprite) return 0;
+  sprite->x=xmm;
+  sprite->y=ymm;
+  sprite->tileid=tileid;
+  fmn_sprite_missile_setup(sprite,targetxmm-xmm,targetymm-ymm,speedmm);
+  return sprite;
+}
+
 /* Spells.
  */
  

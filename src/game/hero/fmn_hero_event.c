@@ -343,6 +343,35 @@ static void fmn_hero_shovel_end() {
   fmn_hero.action=FMN_ITEM_shovel;
 }
 
+/* Coin.
+ */
+ 
+static void fmn_hero_coin_begin() {
+  if (fmn_state_adjust_item_count(FMN_ITEM_coin,-1)) {
+    int16_t x=fmn_hero.x,y=fmn_hero.y;
+    int16_t tx=x,ty=y;
+    switch (fmn_hero.facedir) {
+      case FMN_DIR_N: y-=FMN_MM_PER_TILE>>1; ty-=FMN_MM_PER_TILE<<1; break;
+      case FMN_DIR_S: y+=FMN_MM_PER_TILE>>1; ty+=FMN_MM_PER_TILE<<1; break;
+      case FMN_DIR_W: x-=FMN_MM_PER_TILE>>1; tx-=FMN_MM_PER_TILE<<1; break;
+      case FMN_DIR_E: x+=FMN_MM_PER_TILE>>1; tx+=FMN_MM_PER_TILE<<1; break;
+    }
+    struct fmn_sprite *coin=fmn_game_spawn_missile(x,y,tx,ty,FMN_MM_PER_TILE/4,0x1f);
+  } else {
+    //TODO repudiation sound effect
+  }
+}
+
+/* Umbrella.
+ */
+ 
+static void fmn_hero_umbrella_end() {
+  // We suspend direction changes while active.
+  // Force a re-check.
+  fmn_hero.action=-1;
+  fmn_hero_event_dpad(fmn_hero.indx,fmn_hero.indy);
+}
+
 /* Update action.
  */
  
@@ -377,7 +406,7 @@ static void fmn_hero_begin_action() {
     case FMN_ITEM_bell: fmn_hero_bell_begin(); break;
     case FMN_ITEM_chalk: fmn_hero_chalk_begin(); break;
     case FMN_ITEM_pitcher: fmn_hero_pitcher_begin(); break;
-    case FMN_ITEM_coin: break;//TODO
+    case FMN_ITEM_coin: fmn_hero_coin_begin(); break;
     case FMN_ITEM_match: fmn_hero_match_begin(); break;
     case FMN_ITEM_corn: fmn_hero_corn_begin(); break;
     case FMN_ITEM_umbrella: break;//TODO
@@ -398,6 +427,7 @@ static void fmn_hero_end_action() {
     case FMN_ITEM_wand: fmn_hero_wand_end(); break;
     case FMN_ITEM_violin: fmn_hero_violin_end(); break;
     case FMN_ITEM_shovel: fmn_hero_shovel_end(); return; // sic return
+    case FMN_ITEM_umbrella: fmn_hero_umbrella_end(); break;
   }
   fmn_hero.action=-1;
 }
@@ -407,6 +437,7 @@ static void fmn_hero_end_action() {
  
 static uint8_t fmn_hero_can_change_direction() {
   if (fmn_hero.action==FMN_ITEM_wand) return 0;
+  if (fmn_hero.action==FMN_ITEM_umbrella) return 0;
   return 1;
 }
  

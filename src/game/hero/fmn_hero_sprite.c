@@ -157,6 +157,30 @@ static void fmn_hero_render_compass_active(struct fmn_image *fb,int16_t x,int16_
   fmn_image_blit_tile(fb,x+normdx,y+normdy,&fmnr_image_hero,tileid,xform);
 }
 
+/* Umbrella.
+ */
+ 
+static void fmn_hero_render_umbrella_active(struct fmn_image *fb,int16_t x,int16_t y) {
+  switch (fmn_hero.facedir) {
+    case FMN_DIR_W: {
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE*7)/8,y-(FMN_TILESIZE*7)/8,&fmnr_image_hero,0x73,0);
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE*7)/8,y+(FMN_TILESIZE*1)/8,&fmnr_image_hero,0x83,0);
+      } break;
+    case FMN_DIR_E: {
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE*7)/8,y-(FMN_TILESIZE*7)/8,&fmnr_image_hero,0x73,FMN_XFORM_XREV);
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE*7)/8,y+(FMN_TILESIZE*1)/8,&fmnr_image_hero,0x83,FMN_XFORM_XREV);
+      } break;
+    case FMN_DIR_N: {
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE>>1),y-FMN_TILESIZE,&fmnr_image_hero,0x74,0);
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE>>1),y-FMN_TILESIZE,&fmnr_image_hero,0x75,0);
+      } break;
+    case FMN_DIR_S: {
+        fmn_image_blit_tile(fb,x-(FMN_TILESIZE>>1),y+(FMN_TILESIZE*5)/8,&fmnr_image_hero,0x74,FMN_XFORM_YREV);
+        fmn_image_blit_tile(fb,x+(FMN_TILESIZE>>1),y+(FMN_TILESIZE*5)/8,&fmnr_image_hero,0x75,FMN_XFORM_YREV);
+      } break;
+  }
+}
+
 /* Render carried item.
  */
  
@@ -202,6 +226,7 @@ static void fmn_hero_render_item(struct fmn_image *fb,int16_t x,int16_t y) {
     case FMN_ITEM_corn: fmn_hero_render_carry_small(fb,x,y,0x6a); break;
     case FMN_ITEM_shovel: fmn_hero_render_shovel_active(fb,x,y); break;
     case FMN_ITEM_compass: fmn_hero_render_compass_active(fb,x,y); break;
+    case FMN_ITEM_umbrella: fmn_hero_render_umbrella_active(fb,x,y); break;
   } else {
     uint8_t itemid=fmn_state_get_selected_item_if_possessed();
     switch (itemid) {
