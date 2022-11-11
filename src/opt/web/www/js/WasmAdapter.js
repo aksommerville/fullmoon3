@@ -10,6 +10,7 @@ export class WasmAdapter {
     this._input = 0;
     this.highscore = 0;
     this.waitingForReady = [];
+    this.currentSong = null;
   }
   
   /* Download and instantiate.
@@ -113,6 +114,8 @@ export class WasmAdapter {
   }
   
   _fmn_platform_audio_play_song(v, c) {
+    if (v === this.currentSong) return;
+    this.currentSong = v;
     if (!this.onPlaySong) return;
     const buffer = this.instance.instance.exports.memory.buffer;
     if ((v < 0) || (c < 1) || (v > buffer.byteLength - c)) return;

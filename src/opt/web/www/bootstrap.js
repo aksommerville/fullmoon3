@@ -22,6 +22,7 @@ function render() {
 }
 
 function suspendOrResume(run) {
+  audioManager.suspendOrResume(run);
   if (run) {
     if (!interval) {
       interval = window.setInterval(() => wasmAdapter.update(inputManager.update()), 1000 / 60);
