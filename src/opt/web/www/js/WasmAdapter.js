@@ -20,7 +20,6 @@ export class WasmAdapter {
     const params = this._generateParams();
     return WebAssembly.instantiateStreaming(fetch(path), params).then((instance) => {
       this.instance = instance;
-      console.log(`wasm instance`, this.instance);
       for (const cb of this.waitingForReady) cb();
       this.waitingForReady = [];
       return instance;
@@ -106,27 +105,39 @@ export class WasmAdapter {
   }
   
   _fmn_platform_audio_configure(v, c) {
-    console.log(`fmn_platform_audio_configure`, { v, c });
+    if (!this.onConfigure) return;
+    const buffer = this.instance.instance.exports.memory.buffer;
+    if ((v < 0) || (c < 1) || (v > buffer.byteLength - c)) return;
+    const serial = new Uint8Array(buffer, v, c);
+    this.onConfigure(serial);
   }
   
   _fmn_platform_audio_play_song(v, c) {
-    console.log(`fmn_platform_audio_play_song`, { v, c });
+    if (!this.onPlaySong) return;
+    const buffer = this.instance.instance.exports.memory.buffer;
+    if ((v < 0) || (c < 1) || (v > buffer.byteLength - c)) return;
+    const serial = new Uint8Array(buffer, v, c);
+    this.onPlaySong(serial);
   }
   
   _fmn_platform_audio_pause_song(pause) {
-    console.log(`fmn_platform_audio_pause_song`, pause);
+    if (!this.onPauseSong) return;
+    this.onPauseSong(pause);
   }
   
   _fmn_platform_audio_note(programid, noteid, velocity, durationms) {
-    console.log(`fmn_platform_audio_note`, { programid, noteid, velocity, durationms });
+    if (!this.onNote) return;
+    this.onNote(programid, noteid, velocity, durationms);
   }
   
   _fmn_platform_audio_silence() {
-    console.log(`fmn_platform_audio_silence`);
+    if (!this.onSilence) return;
+    this.onSilence();
   }
   
   _fmn_platform_audio_release_all() {
-    console.log(`fmn_platform_audio_release_all`);
+    if (!this.onReleaseAll) return;
+    this.onReleaseAll();
   }
   
   _fmn_web_external_render(v,w,h) {
