@@ -52,6 +52,7 @@ static int waves_compile_line_wave(const char *src,int srcc,const char *path,int
   }
   
   waves.id=id;
+  waves.web=0;
   float *v=waves.scratch;
   int i=WAVE_LENGTH;
   float p=0.0f;
@@ -211,6 +212,23 @@ static int waves_compile_line_gain(const char *src,int srcc,const char *path,int
   return 0;
 }
 
+/* "web"
+ */
+ 
+static int waves_compile_line_web(const char *src,int srcc,const char *path,int lineno) {
+  if (srcc) {
+    fprintf(stderr,"%s:%d: Unexpected tokens after 'web'\n",path,lineno);
+    return -2;
+  }
+  if (waves.web) {
+    fprintf(stderr,"%s:%d: Already in 'web' mode.\n",path,lineno);
+    return -2;
+  }
+  waves.web=1;
+  if (fmn_encode_fmt(&waves.webtext,"wave %d\n",waves.id)<0) return -1;
+  return 0;
+}
+
 /* Compile one line.
  */
  
@@ -228,10 +246,20 @@ static int waves_compile_line(const char *src,int srcc,const char *path,int line
     return -2;
   }
   
-  if ((kwc==5)&&!memcmp(kw,"noise",5)) return waves_compile_line_noise(src+srcp,srcc-srcp,path,lineno);
-  if ((kwc==9)&&!memcmp(kw,"harmonics",9)) return waves_compile_line_harmonics(src+srcp,srcc-srcp,path,lineno);
-  if ((kwc==9)&&!memcmp(kw,"normalize",9)) return waves_compile_line_normalize(src+srcp,srcc-srcp,path,lineno);
-  if ((kwc==4)&&!memcmp(kw,"gain",4)) return waves_compile_line_gain(src+srcp,srcc-srcp,path,lineno);
+  if (waves.web) {
+    // Web mode. It doesn't really compile, we just copy the text verbatim.
+    if (fmn_encode_raw(&waves.webtext,src,srcc)<0) return -1;
+    if (fmn_encode_raw(&waves.webtext,"\n",1)<0) return -1;
+    return 0;
+    
+  } else {
+    // Cheapsynth mode.
+    if ((kwc==5)&&!memcmp(kw,"noise",5)) return waves_compile_line_noise(src+srcp,srcc-srcp,path,lineno);
+    if ((kwc==9)&&!memcmp(kw,"harmonics",9)) return waves_compile_line_harmonics(src+srcp,srcc-srcp,path,lineno);
+    if ((kwc==9)&&!memcmp(kw,"normalize",9)) return waves_compile_line_normalize(src+srcp,srcc-srcp,path,lineno);
+    if ((kwc==4)&&!memcmp(kw,"gain",4)) return waves_compile_line_gain(src+srcp,srcc-srcp,path,lineno);
+    if ((kwc==3)&&!memcmp(kw,"web",3)) return waves_compile_line_web(src+srcp,srcc-srcp,path,lineno);
+  }
 
   fprintf(stderr,"%s:%d: Unexpected keyword '%.*s'\n",path,lineno,kwc,kw);
   return -2;

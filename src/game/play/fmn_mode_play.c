@@ -315,16 +315,17 @@ struct fmn_sprite *fmn_game_spawn_missile(
  
 //XXX
 static void fmn_game_log_spell(const char *fnname,const uint8_t *v,uint8_t c) {
-  fprintf(stderr,"%s:",fnname);
-  for (;c-->0;v++) switch (*v) {
-    case 0: fprintf(stderr," ."); break;
-    case FMN_DIR_N: fprintf(stderr," N"); break;
-    case FMN_DIR_S: fprintf(stderr," S"); break;
-    case FMN_DIR_W: fprintf(stderr," W"); break;
-    case FMN_DIR_E: fprintf(stderr," E"); break;
-    default: fprintf(stderr," ?"); break;
+  char tmp[32];
+  if (c>sizeof(tmp)) c=sizeof(tmp);
+  int i=0; for (;i<c;i++) switch (v[i]) {
+    case 0: tmp[i]='.'; break;
+    case FMN_DIR_N: tmp[i]='N'; break;
+    case FMN_DIR_S: tmp[i]='S'; break;
+    case FMN_DIR_W: tmp[i]='W'; break;
+    case FMN_DIR_E: tmp[i]='E'; break;
+    default: tmp[i]='?'; break;
   }
-  fprintf(stderr,"\n");
+  fprintf(stderr,"%s: %.*s\n",fnname,c,tmp);
 }
  
 uint8_t fmn_game_cast_spell(const uint8_t *v,uint8_t c) {

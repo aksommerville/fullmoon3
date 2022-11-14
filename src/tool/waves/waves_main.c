@@ -12,9 +12,14 @@ static void waves_print_help(const char *exename) {
     "  --help                     Print this message.\n"
     "  -iPATH,--in=PATH           Input file (text).\n"
     "  -oPATH,--out=PATH          Output file.\n"
-    "  --encoding=c|bin           [c] Output file format. 'bin' is headerless s16, host byte order.\n"
+    "  --encoding=c|bin|web       [c] Output file format, see below.\n"
     "  --progmem=0|1              [0] Use Arduino PROGMEM declaration.\n"
     "  --name=STRING              Name of C object. Inferred from path if empty.\n"
+    "\n"
+    "--encoding:\n"
+    "  c      C source, for baking into the project. Cheapsynth.\n"
+    "  bin    Raw s16 binary, host byte order. Cheapsynth.\n"
+    "  web    Same as 'c', but use text for the Web synthesizer.\n"
   );
 }
 

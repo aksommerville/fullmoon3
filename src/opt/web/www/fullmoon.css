@@ -5,6 +5,10 @@ html {
   font-family: sans-serif;
 }
 
+a {
+  color: #8af;
+}
+
 body {
   margin: 0;
   display: flex;
@@ -15,6 +19,104 @@ body {
   height: 100vh;
 }
 
-canvas {
-  image-rendering: pixelated;
+.hidden {
+  display: none;
+}
+
+/* RootController
+ *****************************************************/
+ 
+.RootController {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.RootController > .middleRow {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden;
+}
+
+.RootController .Sidebar {
+}
+
+.RootController .innards {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Footer
+ ******************************************************/
+ 
+.Footer {
+  border-top: 1px solid #888;
+  margin: 0;
+  padding: 0 1em;
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+  gap: 1em;
+  height: 3rem;
+  align-items: center;
+}
+
+.Footer > li {
+  border-left: 1px solid #444;
+  padding-left: 1em;
+}
+
+.Footer > li:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+/* Header
+ ******************************************************/
+ 
+.Header {
+  border-bottom: 1px solid #888;
+  padding: 0 1em;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  font-size: 9pt;
+  height: 3rem;
+  align-items: center;
+}
+
+.Header label.toggle {
+  user-select: none;
+}
+.Header input.toggle + label {
+  border: 1px solid #888;
+  background-color: #444;
+  color: #ccc;
+  padding: 0.25em 0.5em;
+  border-radius: 0.25em;
+}
+.Header input.toggle:checked + label {
+  border: 1px solid #fff;
+  background-color: #ff0;
+  color: #000;
+}
+
+/* GameView
+ ********************************************************/
+ 
+.GameView {
+  object-fit: contain;
+  image-rendering: pixelated; /* or is it crisp-edges? */
+  flex: 1;
+  cursor: none;
+  max-width: 100vw;
+  max-height: calc(100vh - 6rem); /* 3 rems each for Header and Footer; ignored when fullscreen. */
 }

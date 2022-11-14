@@ -16,9 +16,11 @@
 extern struct waves {
   struct tool_cmdline cmdline;
   int id; // wave in progress if >=0, during compile
+  int web; // nonzero if we have started the web definition
   float scratch[WAVE_LENGTH]; // current wave during compile, before quantization
   int16_t *rawv;
   int rawc,rawa;
+  struct fmn_encoder webtext;
   struct fmn_encoder final;
 } waves;
 

@@ -14,6 +14,8 @@
 - [ ] Targets
 - - [ ] Web
 - - - [ ] Audio
+- - - [ ] Input mapping. Currently hard-coded (entirely unusable for joysticks)
+- - - [ ] Touch input.
 - - [ ] Linux DRM
 - - [ ] Windows
 - - [ ] Thumby
@@ -57,3 +59,4 @@
 - [ ] Ride broom and turn during neighbor screen transition, image gets doubled.
 - [ ] Songs dropping notes or something.
 - [ ] Wasm build exports like every function, dozens or hundreds of them. Find out how to pare that down.
+- [ ] Header Play and Sound toggles not keyboard-accessible.

@@ -1,3 +1,14 @@
+import { Injector } from "./js/core/Injector.js";
+import { Dom } from "./js/core/Dom.js";
+import { RootController } from "./js/ui/RootController.js";
+
+window.addEventListener("load", () => {
+  const injector = new Injector(window, document);
+  const dom = injector.getInstance(Dom);
+  const root = dom.spawnController(document.body, RootController);
+});
+
+/*
 import { WasmAdapter } from "./js/WasmAdapter.js";
 import { VideoOut } from "./js/VideoOut.js";
 import { InputManager } from "./js/InputManager.js";
@@ -69,3 +80,4 @@ window.addEventListener("load", () => {
     console.log(`Failed to fetch or load WebAssembly module.`, error);
   });
 });
+/**/

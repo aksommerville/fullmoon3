@@ -1,16 +1,28 @@
 /* WasmAdapter.js
- * Load, link, and communicate with the Wasm module.
+ * Interface to the game's Wasm context. Loading and all.
  */
  
+import { Audio } from "../audio/Audio.js";
+ 
 export class WasmAdapter {
-  constructor() {
+  static getDependencies() {
+    return [Audio, Window];
+  }
+  constructor(audio, window) {
+    this.audio = audio;
+    this.window = window;
+    
+    this.enableLogging = true; // Wasm code can log to JS console.
+    
     this.instance = null;
     this.fbdirty = false;
-    this.fb = null;
+    this.fb = null; // Uint8Array of RGBA.
+    this.fbw = 0;
+    this.fbh = 0;
     this._input = 0;
-    this.highscore = 0;
     this.waitingForReady = [];
-    this.currentSong = null;
+    this.currentSong = null; // Address in wasm heap, if playing. We discard redundant play_song.
+    this.terminated = false;
   }
   
   /* Download and instantiate.
@@ -41,11 +53,13 @@ export class WasmAdapter {
     this.instance.instance.exports.setup();
   }
   
-  /* Call loop() in Wasm code, with the input state (see InputManager.js)
+  /* Call loop() in Wasm code, with the input state.
    */
   update(input) {
-    this._input = input;
-    this.instance.instance.exports.loop();
+    if (!this.terminated) {
+      this._input = input;
+      this.instance.instance.exports.loop();
+    }
   }
   
   /* If we have received a framebuffer dirty notification from Wasm,
@@ -55,9 +69,39 @@ export class WasmAdapter {
   getFramebufferIfDirty() {
     if (this.fbdirty) {
       this.fbdirty = false;
-      return this.fb;
+      return { fb: this.fb, w: this.fbw, h: this.fbh };
     }
     return null;
+  }
+  
+  /* Find some name exported by the wasm module.
+   * Read it as an address in the module's memory, up to the first NUL.
+   * Return as a Javascript string.
+   * Exception if absent, not terminated, or longer than some sanity limit.
+   */
+  readStaticCString(exportedName) {
+    const SANITY_LIMIT = 8 << 10;
+    if (!this.instance) throw new Error(`Can't look up wasm member '${exportedName}', module not loaded.`);
+    const g = this.instance.instance.exports[exportedName];
+    if (!g) throw new Error(`Wasm export '${exportedName}' not found.`);
+    const p = g.value;
+    const buffer = this.instance.instance.exports.memory.buffer;
+    if ((typeof(p) !== "number") || (p < 0) || (p >= buffer.byteLength)) {
+      throw new Error(`Invalid address for wasm export '${exportedName}'`);
+    }
+    const fullView = new Uint8Array(buffer);
+    let c = 0;
+    for (;;) {
+      if (p + c >= buffer.byteLength) {
+        throw new Error(`Wasm export '${exportedName}' not terminated`);
+      }
+      if (!fullView[p + c]) break;
+      c++;
+      if (c > SANITY_LIMIT) {
+        throw new Error(`Wasm export '${exportedName}' exceeded sanity limit ${SANITY_LIMIT} bytes.`);
+      }
+    }
+    return new TextDecoder().decode(new Uint8Array(buffer, p, c));
   }
   
   /* Private.
@@ -99,6 +143,8 @@ export class WasmAdapter {
   
   _fmn_platform_terminate(status) {
     console.log(`fmn_platform_terminate(${status})`);
+    this.terminated = true;
+    this._input = 0;
   }
 
   _fmn_platform_update() {
@@ -106,52 +152,49 @@ export class WasmAdapter {
   }
   
   _fmn_platform_audio_configure(v, c) {
-    if (!this.onConfigure) return;
     const buffer = this.instance.instance.exports.memory.buffer;
     if ((v < 0) || (c < 1) || (v > buffer.byteLength - c)) return;
     const serial = new Uint8Array(buffer, v, c);
-    this.onConfigure(serial);
+    this.audio.configure(serial);
   }
   
   _fmn_platform_audio_play_song(v, c) {
     if (v === this.currentSong) return;
     this.currentSong = v;
-    if (!this.onPlaySong) return;
     const buffer = this.instance.instance.exports.memory.buffer;
     if ((v < 0) || (c < 1) || (v > buffer.byteLength - c)) return;
     const serial = new Uint8Array(buffer, v, c);
-    this.onPlaySong(serial);
+    this.audio.playSong(serial);
   }
   
   _fmn_platform_audio_pause_song(pause) {
-    if (!this.onPauseSong) return;
-    this.onPauseSong(pause);
+    this.audio.pauseSong(pause);
   }
   
   _fmn_platform_audio_note(programid, noteid, velocity, durationms) {
-    if (!this.onNote) return;
-    this.onNote(programid, noteid, velocity, durationms);
+    this.audio.note(programid, noteid, velocity, durationms);
   }
   
   _fmn_platform_audio_silence() {
-    if (!this.onSilence) return;
-    this.onSilence();
+    this.audio.silence();
   }
   
   _fmn_platform_audio_release_all() {
-    if (!this.onReleaseAll) return;
-    this.onReleaseAll();
+    this.audio.releaseAll();
   }
   
-  _fmn_web_external_render(v,w,h) {
+  _fmn_web_external_render(v, w, h) {
     const buffer = this.instance.instance.exports.memory.buffer;
     const fblen = w * h * 4;
     if ((v < 0) || (v + fblen > buffer.byteLength)) return;
+    this.fbw = w;
+    this.fbh = h;
     this.fb = new Uint8Array(buffer, v, fblen);
     this.fbdirty = true;
   }
   
   _fmn_web_external_console_log(p) {
+    if (!this.enableLogging) return;
     const buffer = this.instance.instance.exports.memory.buffer;
     let text = "";
     if ((p >= 0) && (p < buffer.byteLength)) {
@@ -161,6 +204,8 @@ export class WasmAdapter {
         text += String.fromCharCode(src[i]);
       }
     }
-    console.log(text);
+    console.log(`[game] ${text}`);
   }
 }
+
+WasmAdapter.singleton = true;

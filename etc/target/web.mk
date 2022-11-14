@@ -31,7 +31,7 @@ web_SRCFILES_DATA:=$(filter-out src/data/image/%.tileprops,$(web_SRCFILES_DATA))
 web_MIDFILES_DATA:=$(patsubst src/%,$(web_MIDDIR)/%.c,$(web_SRCFILES_DATA))
 #TODO Image format. Eventually, web should get images in every format, figure out how that's going to work.
 $(web_MIDDIR)/data/%.png.c:src/data/%.png $(tool_EXE_imgcvt);$(PRECMD) $(tool_EXE_imgcvt) -o$@ -i$< --fmt=Y2 --tileprops=src/data/$*.tileprops
-$(web_MIDDIR)/data/waves.txt.c:src/data/waves.txt $(tool_EXE_waves);$(PRECMD) $(tool_EXE_waves) -o$@ -i$< --name=fmnr_waves
+$(web_MIDDIR)/data/waves.txt.c:src/data/waves.txt $(tool_EXE_waves);$(PRECMD) $(tool_EXE_waves) -o$@ -i$< --name=fmnr_waves --encoding=web
 $(web_MIDDIR)/data/%.mid.c:src/data/%.mid $(tool_EXE_songcvt);$(PRECMD) $(tool_EXE_songcvt) -o$@ -i$< --adjust=src/data/$*.adjust
 $(web_MIDDIR)/data/map/%.c:src/data/map/% $(tool_EXE_mapcvt);$(PRECMD) $(tool_EXE_mapcvt) -o$@ -i$<
 $(web_MIDDIR)/data/%.c:src/data/% $(tool_EXE_rawdata);$(PRECMD) $(tool_EXE_rawdata) -o$@ -i$<

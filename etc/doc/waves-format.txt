@@ -1,4 +1,5 @@
 Format for cheapsynth waves source.
+I'm extending this to also support the Web synthesizer.
 
 Line-oriented text file.
 A wave chunk begins with a line: wave ID
@@ -6,6 +7,8 @@ ID is for validation only; they must be sequential from zero.
 
 Within a wave chunk, each line is some operation to perform on the buffer.
 The buffer is initially a sine wave.
+
+--------------------------------------
 
 sine
   Overwrite buffer with a sine wave.
@@ -32,3 +35,21 @@ normalize [LEVEL]
 gain WHOLE FRACT [CLIP [GATE]]
   Scale values by a constant, then optionally clip high and low.
   (FRACT,CLIP,GATE) in 0..999, because I don't feel like parsing floats.
+  
+--------------------------------
+  
+web
+  Begin wave definition for the web synthesizer. Cheapsynth definition stops here.
+  
+The "web" section is delivered to the app verbatim (just comments and extraneous whitespace removed).
+
+harmonics [COEFFICIENTS...]
+  Same as Cheapsynth, but can only appear once.
+  
+sine|square|sawtooth|triangle
+  Can substitute for "harmonics".
+  
+fm RATE DEPTH
+  
+chorus DEPTH
+  Add a cheap chorus effect. DEPTH should be around 1.

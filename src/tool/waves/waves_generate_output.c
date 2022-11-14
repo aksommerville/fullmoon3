@@ -39,7 +39,7 @@ static int waves_get_c_name(char *dst,int dsta) {
   return snprintf(dst,dsta,"fmnr_waves_%.*s",srcc,src);
 }
 
-/* Encode as C text.
+/* Encode as C text for Cheapsynth.
  */
  
 static int waves_encode_c() {
@@ -81,7 +81,48 @@ static int waves_encode_c() {
   return 0;
 }
 
-/* Emit the entire output dump as s16, native byte order.
+/* Encode to C from web text.
+ */
+
+static int waves_encode_web() {
+  #define OUT(fmt,...) { if (fmn_encode_fmt(&waves.final,fmt,##__VA_ARGS__)<0) return -1; }
+  
+  char name[64];
+  int namec=waves_get_c_name(name,sizeof(name));
+  if ((namec<1)||(namec>=sizeof(name))) {
+    fprintf(stderr,"%s: Unable to determine name for C object.\n",waves.cmdline.exename);
+    return -2;
+  }
+  
+  OUT("#include <stdint.h>\n")
+  if (tool_cmdline_get_option_boolean(&waves.cmdline,"progmem",7)) {
+    OUT("#include <avr/pgmspace.h>\n")
+  } else {
+    OUT("#define PROGMEM\n") // so it needn't be conditional anywhere else
+  }
+  
+  OUT("const char %.*s[] PROGMEM=\n",namec,name)
+  const char *src=waves.webtext.v;
+  int srcp=0;
+  while (srcp<waves.webtext.c) {
+    OUT("\"")
+    while (srcp<waves.webtext.c) {
+      char ch=((char*)(waves.webtext.v))[srcp++];
+      if (ch==0x0a) OUT("\\n")
+      else if ((ch=='"')||(ch=='\\')) OUT("\\%c",ch)
+      else if ((ch>=0x20)&&(ch<=0x7e)) OUT("%c",ch)
+      else OUT("\\x%02x",(unsigned char)ch)
+      if (ch==0x0a) break;
+    }
+    OUT("\"\n")
+  }
+  OUT(";\n")
+
+  #undef OUT
+  return 0;
+}
+
+/* Trivial encodings: bin
  */
  
 static int waves_encode_bin() {
@@ -100,6 +141,7 @@ int waves_generate_output() {
   
   if ((encodingc==1)&&!memcmp(encoding,"c",1)) return waves_encode_c();
   if ((encodingc==3)&&!memcmp(encoding,"bin",3)) return waves_encode_bin();
+  if ((encodingc==3)&&!memcmp(encoding,"web",3)) return waves_encode_web();
   
   fprintf(stderr,
     "%s: Unknown encoding '%.*s'. Expected 'c' or 'bin'.\n",
